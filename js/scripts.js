@@ -20,5 +20,12 @@ const pokemonList = [
 // Loop over list of pokemon to display data of each pokemon
 for (let i = 0; i < pokemonList.length; i++) {
   const { name, height } = pokemonList[i]
-  document.write(`${name}: ${height} <br>`)
+
+  let str = `${name}: ${height}`
+
+  // Check if pokemon height is greater than 1
+  if (height > 1) str += ' - Wow, that\'s big!'
+
+  // Print string to page
+  document.write(`${str}<br>`)
 }
