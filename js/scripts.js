@@ -1,3 +1,6 @@
+const pokemonUL = document.getElementById('pokemonList')
+console.log(pokemonUL)
+
 // IIFE of pokemon data and functions to access/edit pokemon data
 let pokemonRespository = (function() {
   // Empty array of pokemon
@@ -219,7 +222,17 @@ pokemonRespository.getAll().forEach(printPokemon)
 function printPokemon(pokemon) {
   // Deconstruct the pokemon object being passed
   const { name, height } = pokemon
+
+  // Create a li element and a button element
+  const listItem = document.createElement('li')
+  const button = document.createElement('button')
+  button.innerText = name
+  button.classList.add('pokemon-button')
+  listItem.appendChild(button)
   
+  // Append the li element and it's child element (button) to the ul
+  pokemonUL.appendChild(listItem)
+
   // Create a string variable of the pokemon's name and height
   let str = `${name}: ${height}`
 
