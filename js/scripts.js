@@ -1,3 +1,4 @@
+// List of Pokemon
 const pokemonList = [
   {
     name: 'Bulbasaur',
