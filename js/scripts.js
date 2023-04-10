@@ -16,3 +16,9 @@ const pokemonList = [
     types: [ 'fighting' ]
   }
 ]
+
+// Loop over list of pokemon to display data of each pokemon
+for (let i = 0; i < pokemonList.length; i++) {
+  const { name, height } = pokemonList[i]
+  document.write(`${name}: ${height} <br>`)
+}
