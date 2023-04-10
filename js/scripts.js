@@ -18,12 +18,17 @@ const pokemonList = [
 ]
 
 // Loop over list of pokemon to display data of each pokemon
-for (let i = 0; i < pokemonList.length; i++) {
-  const { name, height } = pokemonList[i]
+pokemonList.forEach(printPokemon)
 
+// Function used to print data of pokemon object
+function printPokemon(pokemon) {
+  // Deconstruct the pokemon object being passed
+  const { name, height } = pokemon
+  
+  // Create a string variable of the pokemon's name and height
   let str = `${name}: ${height}`
 
-  // Check if pokemon height is greater than 1
+  // Check if pokemon height is greater than 1: if TRUE, append text to string variable
   if (height > 1) str += ' - Wow, that\'s big!'
 
   // Print string to page
