@@ -1,0 +1,24 @@
+/* UL of Pokemon */
+.pokemon-list {
+  list-style: none;
+  padding: 0;
+}
+
+/* Pokemon Button Container */
+li {
+  width: 100%;
+}
+
+/* Pokemon Buttons */
+.pokemon-button {
+  padding: 0.5rem;
+  width: 100%;
+  background-color: transparent;
+  border: none;
+  outline: none;
+  cursor: pointer;
+  transition: all 0.5s ease-in;
+}
+.pokemon-button:hover {
+  background-color: rgba(0,0,0,0.25);
+}

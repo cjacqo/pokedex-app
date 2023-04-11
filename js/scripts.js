@@ -1,10 +1,39 @@
-const pokemonUL = document.getElementById('pokemonList')
-console.log(pokemonUL)
-
 // IIFE of pokemon data and functions to access/edit pokemon data
 let pokemonRespository = (function() {
   // Empty array of pokemon
   const pokemonList = []
+
+  // DOM Element: UL of pokemon
+  const pokemonUL = document.getElementById('pokemonList')
+
+  // Show details of pokemon
+  function showDetails(obj) {
+    console.log(obj)
+  }
+
+  // Add list item to DOM
+  function addListItem(obj) {
+    // Deconstruct the pokemon object being passed
+    const { name } = obj
+
+    // Create a li element and a button element
+    const listItem = document.createElement('li')
+    const button = document.createElement('button')
+    button.innerText = name
+    button.classList.add('pokemon-button')
+    button.setAttribute('data-pokemon', name)
+
+    // Add event listener to button element
+    button.addEventListener('click', function() {
+      showDetails(obj)
+    })
+    
+    // Append the button to the li element
+    listItem.appendChild(button)
+    
+    // Append the li element and it's child element (button) to the ul
+    pokemonUL.appendChild(listItem)
+  }
 
   return {
     // Add function and related methods to create and insert a pokemon object into the pokemonList array
@@ -173,6 +202,8 @@ let pokemonRespository = (function() {
         }
       }
     },
+    // Add list item to DOM
+    addListItem,
     // Return pokemon object based on name passed in parameter
     findByName: function(name) {
       // Filter the pokemonList array and find pokemon object with same name as parameter; desctructure (unwrap from array) the object if found
@@ -216,29 +247,6 @@ pokemonRespository.add()
 console.log(pokemonRespository.findByName('Bulbasaur'))
 
 // Loop over list of pokemon to display data of each pokemon
-pokemonRespository.getAll().forEach(printPokemon)
-
-// Function used to print data of pokemon object
-function printPokemon(pokemon) {
-  // Deconstruct the pokemon object being passed
-  const { name, height } = pokemon
-
-  // Create a li element and a button element
-  const listItem = document.createElement('li')
-  const button = document.createElement('button')
-  button.innerText = name
-  button.classList.add('pokemon-button')
-  listItem.appendChild(button)
-  
-  // Append the li element and it's child element (button) to the ul
-  pokemonUL.appendChild(listItem)
-
-  // Create a string variable of the pokemon's name and height
-  let str = `${name}: ${height}`
-
-  // Check if pokemon height is greater than 1: if TRUE, append text to string variable
-  if (height > 1) str += ' - Wow, that\'s big!'
-
-  // Print string to page
-  document.write(`${str}<br>`)
-}
+pokemonRespository.getAll().forEach(function(pokemon) {
+  pokemonRespository.addListItem(pokemon)
+})
