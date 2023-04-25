@@ -36,6 +36,33 @@ let Modals = (function() {
 // IIFE for creating pokemon cards
 let PokemonDOMFactory = (function() {
 
+  // DOM Element: Container of Pokemon
+  const pokemonCardsContainer = document.getElementById('pokemonCardsContainer')
+
+  // Create Element: Pokemon Card Item
+  function createPokemonCard(obj) {
+    // Deconstruct the pokemon object being passed
+    console.log(obj)
+    const { name } = obj
+
+    const pokemonCard = document.createElement('div')
+    const button = document.createElement('button')
+    button.innerText = name
+    button.classList.add('pokemon-button')
+    button.setAttribute('data-pokemon', name)
+
+    button.addEventListener('click', function() {
+      PokemonRespository.showDetails(obj)
+    })
+
+    pokemonCard.appendChild(button)
+    pokemonCardsContainer.appendChild(pokemonCard)
+  }
+
+  return {
+    createPokemon: createPokemonCard
+  }
+
 })()
 
 // IIFE of pokemon data and functions to access/edit pokemon data
@@ -44,9 +71,6 @@ let PokemonRespository = (function() {
   const pokemonList = []
   // API URL
   const apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150'
-
-  // DOM Element: UL of pokemon
-  const pokemonUL = document.getElementById('pokemonList')
 
   // Load list of pokemon from API
   function loadList() {
@@ -87,30 +111,6 @@ let PokemonRespository = (function() {
     })
   }
 
-  // Add list item to DOM
-  function addListItem(obj) {
-    // Deconstruct the pokemon object being passed
-    const { name } = obj
-
-    // Create a li element and a button element
-    const listItem = document.createElement('li')
-    const button = document.createElement('button')
-    button.innerText = name
-    button.classList.add('pokemon-button')
-    button.setAttribute('data-pokemon', name)
-
-    // Add event listener to button element
-    button.addEventListener('click', function() {
-      showDetails(obj)
-    })
-    
-    // Append the button to the li element
-    listItem.appendChild(button)
-    
-    // Append the li element and it's child element (button) to the ul
-    pokemonUL.appendChild(listItem)
-  }
-
   // New add pokemon function; no chaining; simply push pokemon object to array
   function addPokemon(obj) {
     pokemonList.push(obj)
@@ -137,8 +137,8 @@ let PokemonRespository = (function() {
   return {
     // Add pokemon to list
     addPokemon,
-    // Add list item to DOM
-    addListItem,
+    // Show details of pokemon
+    showDetails,
     // Return pokemon object based on name passed in parameter
     findByName,
     // Return pokemonList array
@@ -151,7 +151,7 @@ let PokemonRespository = (function() {
 PokemonRespository.loadList().then(function() {
   // Now the data is loaded!
   PokemonRespository.getAll().forEach(function(pokemon) {
-    PokemonRespository.addListItem(pokemon)
+    PokemonDOMFactory.createPokemon(pokemon)
   })
 })
 

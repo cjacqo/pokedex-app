@@ -25,6 +25,10 @@
   list-style: none;
   padding: 0;
 }
+.pokemon-cards-container {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+}
 
 /* Pokemon Button Container */
 li {
