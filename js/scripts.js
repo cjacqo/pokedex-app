@@ -1,5 +1,45 @@
+// IIFE of modal display and events
+let Modals = (function() {
+  let modalContainer = document.querySelector('#modal-container')
+
+  function showModal(pokemon) {
+    // Clear existing modal content
+    modalContainer.innerHTML = ''
+
+    let modal = document.createElement('div')
+    modal.classList.add('modal')
+
+    // Add the new modal content
+    let closeBtnElement = document.createElement('button')
+    closeBtnElement.classList.add('modal-close')
+    closeBtnElement.innerText = 'Close'
+
+    let titleElement = document.createElement('h1')
+    titleElement.innerText = 'Modal Title'
+
+    let contentElement = document.createElement('p')
+    contentElement.innerText = 'Modal text...'
+
+    modal.appendChild(closeBtnElement)
+    modal.appendChild(titleElement)
+    modal.appendChild(contentElement)
+    modalContainer.appendChild(modal)
+
+    modalContainer.classList.add('is-visible')
+  }
+
+  return {
+    show: showModal
+  }
+})()
+
+// IIFE for creating pokemon cards
+let PokemonDOMFactory = (function() {
+
+})()
+
 // IIFE of pokemon data and functions to access/edit pokemon data
-let pokemonRespository = (function() {
+let PokemonRespository = (function() {
   // Empty array of pokemon
   const pokemonList = []
   // API URL
@@ -43,7 +83,7 @@ let pokemonRespository = (function() {
   // Show details of pokemon
   function showDetails(obj) {
     loadDetails(obj).then(function() {
-      console.log(obj)
+      Modals.show(obj)
     })
   }
 
@@ -108,19 +148,19 @@ let pokemonRespository = (function() {
   }
 })()
 
-pokemonRespository.loadList().then(function() {
+PokemonRespository.loadList().then(function() {
   // Now the data is loaded!
-  pokemonRespository.getAll().forEach(function(pokemon) {
-    pokemonRespository.addListItem(pokemon)
+  PokemonRespository.getAll().forEach(function(pokemon) {
+    PokemonRespository.addListItem(pokemon)
   })
 })
 
 // TEST: testing the findByName method
 setTimeout(function() {
-  console.log(pokemonRespository.findByName('bulbasaur'))
+  console.log(PokemonRespository.findByName('bulbasaur'))
 }, 200)
 
 // Loop over list of pokemon to display data of each pokemon
-pokemonRespository.getAll().forEach(function(pokemon) {
-  pokemonRespository.addListItem(pokemon)
-})
+// PokemonRespository.getAll().forEach(function(pokemon) {
+//   PokemonRespository.addListItem(pokemon)
+// })
