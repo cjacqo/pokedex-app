@@ -255,8 +255,7 @@ let PokemonDOMFactory = (function() {
         const currEvolutionImage = createImageElement(currEvolution.species.imageUrl)
 
         // FINISH MAKING THIS
-        const arrowImage = document.createElement('div')
-        arrowImage.innerText = '>'
+        const arrowImage = createImageElement('./svg/arrow.svg')
 
         const nextEvolutionImage = createImageElement(nextEvolution.species.imageUrl)
 
