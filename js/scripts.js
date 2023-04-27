@@ -588,19 +588,6 @@ let PokemonRespository = (function() {
   }
 
   function loadEvolutions(pokemon) {
-    console.log(pokemon)
-    console.log(pokemon.id)
-    let evolutionsUrl = apiUrlBuilder('evolution-chain', pokemon.id)
-    return fetch(evolutionsUrl).then(function(response) {
-      return response.json()
-    }).then(function(evolutions) {
-      pokemon.evolutions = evolutions.chain
-    }).catch(function(e) {
-      console.error(e)
-    })
-  }
-
-  function loadEvolutionsTest(pokemon) {
 
     // Function to get the id of the species at the end of the url: found at https://stackoverflow.com/questions/39160539/regex-pattern-to-get-number-between-forward-slashes-at-the-end-of-a-url
     function getSpeciesId(s) {
@@ -669,7 +656,7 @@ let PokemonRespository = (function() {
       basic: loadBasicDetails,
       stats: loadStats,
       profile: loadProfileDetails,
-      evolutions: loadEvolutionsTest
+      evolutions: loadEvolutions
     },
     get pokemon() { return pokemonList }
   }
