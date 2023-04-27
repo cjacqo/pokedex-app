@@ -1,3 +1,9 @@
+*,
+*::after,
+*::before {
+  box-sizing: border-box;
+}
+
 /* ROOT VARIABLES */
 :root {
   --type-normal: #A8A77A;
@@ -20,19 +26,87 @@
   --type-fairy: #D685AD;
 }
 
-/* UL of Pokemon */
-.pokemon-list {
-  list-style: none;
-  padding: 0;
+.grid {
+  display: grid;
 }
+
+.flex {
+  display: flex;
+}
+.flex.col {
+  flex-direction: column;
+}
+.flex.jc-c {
+  justify-content: center;
+}
+.flex.jc-sa {
+  justify-content: space-around;
+}
+.flex.jc-se {
+  justify-content: space-evenly;
+}
+.flex.jc-sb {
+  justify-content: space-between;
+}
+.flex.ai-c {
+  align-items: center;
+}
+
+/* Grid of Pokemon */
 .pokemon-cards-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(16rem, 1fr));
+  gap: 5px;
 }
 
+/* Pokemon Card */
+.pokemon-card {
+  border: 0.1rem solid rgba(0, 0, 0, 0.5);
+  border-radius: 0.3rem;
+  cursor: pointer;
+}
+
+/* Name */
+.name-container h6 {
+  font-size: 1.2rem;
+}
+
+/* Type Containers */
+.type-circle {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+}
+.type {
+  padding: 0.25rem;
+  display: inline-block;
+  line-height: 1;
+}
+.normal { background-color: var(--type-normal); }
+.fire { background-color: var(--type-fire); }
+.water { background-color: var(--type-water); }
+.electric { background-color: var(--type-electric); }
+.grass { background-color: var(--type-grass); }
+.ice { background-color: var(--type-ice); }
+.fighting { background-color: var(--type-normal); }
+.poison { background-color: var(--type-poison); }
+.ground { background-color: var(--type-ground); }
+.flying { background-color: var(--type-flying); }
+.psychic { background-color: var(--type-psychic); }
+.bug { background-color: var(--type-bug); }
+.rock { background-color: var(--type-rock); }
+.ghost { background-color: var(--type-ghost); }
+.dragon { background-color: var(--type-dragon); }
+.dark { background-color: var(--type-dark); }
+.steel { background-color: var(--type-steel); }
+.fairy { background-color: var(--type-fairy); }
+
+.white-font { color: #FFFFFF; }
+.bold { font-weight: 700; }
+
 /* Pokemon Button Container */
-li {
-  width: 100%;
+.pokemon-card-container.fire {
+  background-color: var(--type-fire);
 }
 
 /* Pokemon Buttons */
@@ -77,4 +151,117 @@ li {
 
 .modal {
   background-color: #fff;
+}
+
+/* DEFAULT MIN-WIDTH AND MAX-WIDTH OF CONTENT CONTAINERS */
+.content-container {
+  min-width: 250px;
+  max-width: 650px;
+  margin: 0 auto;
+}
+
+/* IMAGE TYPES STATS CONTAINER */
+.img-types-stats-container,
+.type-stats-container {
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* --- Image Container & Image */
+.img-types-stats-container .img-container {
+  min-height: 160px;
+}
+.img-types-stats-container .img-container img {
+  min-width: 160px;
+  min-height: 160px;
+}
+
+/* --- Types Container */
+.types-stats-container {
+  align-items: center;
+  gap: 0.3rem;
+}
+.types-container {
+  text-align: left;
+  gap: 0.5rem;
+}
+
+/* --- Stats Container */
+.stats-container {
+  min-width: 250px;
+  max-width: 350px;
+  gap: 0.3rem;
+}
+/* --- Stat Title & Bars */
+.stat-title {
+  flex-grow: 1;
+  flex-basis: 0;
+  text-align: left;
+}
+.stat-bar {
+  flex-basis: 0;
+  -webkit-box-flex: 2;
+  flex-grow: 2;
+  background-color: #EDEDED;
+  position: relative;
+}
+.stat-bar-bg,
+.stat-bar-fg {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+.stat-bar-bg {
+  transform-origin: left;
+}
+.stat-bar-fg {
+  text-align: left;
+  padding-left: 0.25rem;
+}
+
+/* PROFILE CONTENT */
+/* --- Profile Details Table */
+.profile-content-container {
+  grid-template-columns: 1fr;
+  grid-template-rows: auto;
+  gap: 0.3rem;
+}
+.table-row {
+  justify-content: space-evenly !important;
+}
+.row-item-container {
+  flex-basis: 20%;
+  flex-grow: 1;
+  flex-shrink: 1;
+  text-align: left;
+}
+.row-item-container p {
+  margin: 0;
+}
+.table-row-title {
+  text-align: right;
+  padding-right: 20px;
+}
+
+
+/* When the browser is at least 530px and above */
+@media screen and (min-width: 530px) {
+  /* IMAGE TYPES STATS CONTAINER */
+  .img-types-stats-container {
+    flex-direction: row;
+    width: 95%;
+    margin: 0 auto;
+  }
+  .img-types-stats-container > * {
+    flex-grow: 1;
+  }
+  .img-types-stats-container > .img-container {
+    background-color: red;
+    margin-right: 1rem;
+  }
+  .types-stats-container {
+    align-items: flex-start;
+  }
 }
