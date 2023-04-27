@@ -245,6 +245,12 @@
   padding-right: 20px;
 }
 
+/* EVOLUTIONS CONTENT */
+/* --- Images Wrapper */
+.evolution-imgs-wrapper {
+  gap: 2rem;
+}
+
 
 /* When the browser is at least 530px and above */
 @media screen and (min-width: 530px) {

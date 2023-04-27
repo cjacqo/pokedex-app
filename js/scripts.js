@@ -113,6 +113,15 @@ let PokemonDOMFactory = (function() {
       return container
     }
 
+    // Create Text Container
+    function createTextContainer(containerClassNames, element, str) {
+      const container = createContainer(...containerClassNames)
+      const textElement = document.createElement(element ? element : 'p')
+      textElement.innerText = str
+      container.appendChild(textElement)
+      return container
+    }
+
     // Create Table Row
     function createTableRow(rowTitle, rowData, rowParent) {
       const container = createContainer('table-row', rowParent, 'flex', 'jc-sb')
@@ -237,7 +246,36 @@ let PokemonDOMFactory = (function() {
     // Pokemon Evolutions
     function createEvolutionsContent(evolutions) {
       const container = createContainer('content-container', 'evolutions-content-container')
-      console.log(evolutions)
+
+      // Function to create evolution container
+      function createEvolutionContainer(currEvolution, nextEvolution) {
+        const evolutionContainer = createContainer('evolution-container')
+        const imagesWrapper = createContainer('evolution-imgs-wrapper', 'flex', 'jc-c', 'ai-c')
+
+        const currEvolutionImage = createImageElement(currEvolution.species.imageUrl)
+
+        // FINISH MAKING THIS
+        const arrowImage = document.createElement('div')
+        arrowImage.innerText = '>'
+
+        const nextEvolutionImage = createImageElement(nextEvolution.species.imageUrl)
+
+        const evolutionDetail = createTextContainer([ 'evolution-details' ], 'p', `${StrHelpers.capitalize(currEvolution.species.name)} evolves into ${StrHelpers.capitalize(nextEvolution.species.name)} at level ${nextEvolution.details.minLevel}`)
+
+        imagesWrapper.appendChild(currEvolutionImage)
+        imagesWrapper.appendChild(arrowImage)
+        imagesWrapper.appendChild(nextEvolutionImage)
+        evolutionContainer.appendChild(imagesWrapper)
+        evolutionContainer.appendChild(evolutionDetail)
+        return evolutionContainer
+      }
+      
+      evolutions.forEach((currEvolution, i) => {
+        if (i < evolutions.length - 1) {
+          let nextEvolution = evolutions[i + 1]
+          container.appendChild(createEvolutionContainer(currEvolution, nextEvolution))
+        }
+      })
       return container
     }
     
