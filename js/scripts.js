@@ -253,12 +253,8 @@ let PokemonDOMFactory = (function() {
         const imagesWrapper = createContainer('evolution-imgs-wrapper', 'flex', 'jc-c', 'ai-c')
 
         const currEvolutionImage = createImageElement(currEvolution.species.imageUrl)
-
-        // FINISH MAKING THIS
         const arrowImage = createImageElement('./svg/arrow.svg')
-
         const nextEvolutionImage = createImageElement(nextEvolution.species.imageUrl)
-
         const evolutionDetail = createTextContainer([ 'evolution-details' ], 'p', `${StrHelpers.capitalize(currEvolution.species.name)} evolves into ${StrHelpers.capitalize(nextEvolution.species.name)} at level ${nextEvolution.details.minLevel}`)
 
         imagesWrapper.appendChild(currEvolutionImage)
