@@ -288,12 +288,12 @@ let PokemonDOMFactory = (function() {
 
       // Damage Relations
       function createEvolutions(evolutions) {
-        const damageRelationsSection = DOMBuilder.container('section', 'evolutions-section')
+        const evolutionsSection = DOMBuilder.container('section', 'evolutions-section')
         const subHeader = DOMBuilder.subHeader('Evolutions', types[0])
-        // const damageRelationsContent = DOMBuilder.damageRelationsContent(damageRelations)
-        damageRelationsSection.appendChild(subHeader)
-        // damageRelationsSection.appendChild(damageRelationsContent)
-        return damageRelationsSection
+        const evolutionsContent = DOMBuilder.evolutionsContent(evolutions)
+        evolutionsSection.appendChild(subHeader)
+        evolutionsSection.appendChild(evolutionsContent)
+        return evolutionsSection
       }
       
       // function createNameImageTypeStats() {
@@ -336,7 +336,7 @@ let PokemonDOMFactory = (function() {
             // Evolutions Section
             PokemonRespository.getDetails.evolutions(pokemon).then(function() {
               const { evolutions } = pokemon
-              console.log(evolutions)
+              // evolutions.forEach(evolution => console.log(evolution.species.imageUrl))
               sectionsArr.push(createEvolutions(evolutions))
             }).finally(function() {
               sectionsArr.forEach(section => contentContainer.appendChild(section))
@@ -557,7 +557,6 @@ let PokemonRespository = (function() {
     return fetch(url).then(function(response) {
       return response.json()
     }).then(function(details) {
-      console.log(details)
       pokemon.stats = details.stats
     }).catch(function(e) {
       console.error(e)
@@ -589,11 +588,74 @@ let PokemonRespository = (function() {
   }
 
   function loadEvolutions(pokemon) {
-    let url = `https://pokeapi.co/api/v2/evolution-chain/${pokemon.id}`
-    return fetch(url).then(function(response) {
+    console.log(pokemon)
+    console.log(pokemon.id)
+    let evolutionsUrl = apiUrlBuilder('evolution-chain', pokemon.id)
+    return fetch(evolutionsUrl).then(function(response) {
       return response.json()
     }).then(function(evolutions) {
       pokemon.evolutions = evolutions.chain
+    }).catch(function(e) {
+      console.error(e)
+    })
+  }
+
+  function loadEvolutionsTest(pokemon) {
+
+    // Function to get the id of the species at the end of the url: found at https://stackoverflow.com/questions/39160539/regex-pattern-to-get-number-between-forward-slashes-at-the-end-of-a-url
+    function getSpeciesId(s) {
+      let m = s.match(/\/(\d+)\//)
+      return m[1]
+    }
+
+    // Function to create a evolution object
+    function Evolution(details, species, evolvesTo) {
+      this.details = details.length === 0 ? false : {
+        get minLevel() { return details[0].min_level }
+      }
+      this.species = {
+        get name() { return species.name },
+        get url() { return species.url },
+        get imageUrl() { return `https:///raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${getSpeciesId(this.url)}.png` }
+      },
+      this.evolvesTo = evolvesTo.length === 0 ? false : {
+        get evolution() { return evolvesTo[0] }
+      }
+    }
+
+    // Function to create a evolution from/to object
+    function recurseEvolutionDetails(request, response) {
+      if (!request.evolvesTo) return
+      const { evolution_details, species, evolves_to } = request.evolvesTo.evolution
+      const evolution = new Evolution(evolution_details, species, evolves_to)
+      response.push(evolution)
+      recurseEvolutionDetails(evolution, response)
+    }
+
+    // Function to parse the evolution chain
+    function parseEvolutions(chain) {
+      let response = []
+      const { evolution_details, species, evolves_to } = chain
+      const evolution = new Evolution(evolution_details, species, evolves_to)
+      response.push(evolution)
+      recurseEvolutionDetails(evolution, response)
+      return response
+    }
+    
+    // 1: Load the species
+    let speciesUrl = apiUrlBuilder('pokemon-species', pokemon.name)
+    return fetch(speciesUrl).then(function(response) {
+      return response.json()
+    }).then(function(speciesResponse) {
+      // 2: Load the evolution chain
+      return fetch(speciesResponse.evolution_chain.url).then(function(response) {
+        return response.json()
+      }).then(function(evolutionsResponse) {
+        const { chain } = evolutionsResponse
+        pokemon.evolutions = parseEvolutions(chain)
+      }).catch(function(e) {
+        console.error(e)
+      })
     }).catch(function(e) {
       console.error(e)
     })
@@ -607,7 +669,7 @@ let PokemonRespository = (function() {
       basic: loadBasicDetails,
       stats: loadStats,
       profile: loadProfileDetails,
-      evolutions: loadEvolutions
+      evolutions: loadEvolutionsTest
     },
     get pokemon() { return pokemonList }
   }
