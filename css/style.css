@@ -104,6 +104,10 @@
 .white-font { color: #FFFFFF; }
 .bold { font-weight: 700; }
 
+.hidden {
+  display: none;
+}
+
 /* Pokemon Button Container */
 .pokemon-card-container.fire {
   background-color: var(--type-fire);
@@ -251,6 +255,38 @@
   gap: 2rem;
 }
 
+/* MOVES CONTENT */
+/* --- Moves Group */
+.moves-group {
+  padding: 0 2rem;
+}
+/* --- Move Elements */
+.move-detail {
+  line-height: 1;
+}
+.move-level-element {
+  flex-basis: 15%;
+}
+.move-title-element {
+  text-align: left;
+  flex-basis: 50%;
+}
+.move-type-element {
+  flex-basis: 20%;
+}
+.move-button {
+  width: 36px;
+}
+/* --- Move Stats: Dropdown */
+.drop-down-row {
+  width: 85%;
+  padding: 0 5%;
+  margin: 0 auto;
+  background-color: rgba(0,0,0,0.25);
+}
+.move-effect-container {
+  text-align: left;
+}
 
 /* When the browser is at least 530px and above */
 @media screen and (min-width: 530px) {
