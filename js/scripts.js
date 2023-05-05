@@ -453,6 +453,11 @@ let PokemonDOMFactory = (function() {
       closeBtnElement.classList.add('modal-close')
       closeBtnElement.innerText = 'Close'
 
+      closeBtnElement.addEventListener('click', (e) => {
+        e.preventDefault()
+        modalContainer.classList.remove('is-visible')
+      })
+
       // Content element
       let modalContent = createModalContent(pokemon)
 
@@ -462,7 +467,7 @@ let PokemonDOMFactory = (function() {
 
       modalContainer.classList.add('is-visible')
     }
-    
+
     return {
       show: showModal
     }
@@ -563,7 +568,6 @@ let PokemonRespository = (function() {
     },
     set move(move) {
       const moveGroup = move.details.group
-      console.log(move.details.name)
       this._moves[moveGroup].push(move)
       return this
     },

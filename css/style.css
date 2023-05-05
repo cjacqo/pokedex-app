@@ -26,6 +26,10 @@
   --type-fairy: #D685AD;
 }
 
+p {
+  margin: 0;
+}
+
 .grid {
   display: grid;
 }
@@ -260,9 +264,18 @@
 .moves-group {
   padding: 0 2rem;
 }
+.moves-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
 /* --- Move Elements */
+.move-row {
+  align-items: center;
+}
 .move-detail {
   line-height: 1;
+  /* padding: 1rem 0.5rem; */
 }
 .move-level-element {
   flex-basis: 15%;
