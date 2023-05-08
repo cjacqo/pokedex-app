@@ -446,7 +446,7 @@ let PokemonDOMFactory = (function() {
 
       // Create a modal element
       let modal = document.createElement('div')
-      modal.classList.add('modal')
+      modal.classList.add('modal-box')
 
       // Close button for modal
       let closeBtnElement = document.createElement('button')
@@ -480,7 +480,8 @@ let PokemonDOMFactory = (function() {
       const { name, imageUrl, types } = pokemon
 
       const pokemonCard = document.createElement('div')
-      pokemonCard.classList.add('pokemon-card', 'flex', 'col', 'jc-c')
+      pokemonCard.classList.add('pokemon-card', 'list-group-item')
+      // pokemonCard.classList.add('pokemon-card', 'flex', 'col', 'jc-c')
       pokemonCard.setAttribute('data-pokemon', name)
       const nameTypesBar = DOMBuilder.cardHeader(name, types)
       const imgElement = DOMBuilder.image(imageUrl)
