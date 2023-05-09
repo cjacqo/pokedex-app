@@ -145,6 +145,23 @@ p {
   height: 100vh;
   gap: 5px;
 }
+#filterByTypeBtn {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  width: 100%;
+  color: #FFF;
+  text-align: left;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 10px;
+  padding: 1rem 0;
+  padding-left: 1rem;
+}
+#filterByTypeBtn[aria-expanded='true'] {
+  background-color: rgba(255, 255, 255, 0.25);
+}
 .dropdown-menu {
   width: 100%;
   transform: translate3d(0px, 30px, 0px);
@@ -190,41 +207,23 @@ p {
 .dropdown-item#steel .circle { border-color: var(--type-steel); }
 .dropdown-item#fairy .circle { border-color: var(--type-fairy); }
 
-.dropdown-item#normal:hover .circle,
 .dropdown-item#normal.selected .circle { background-color: var(--type-normal); }
-.dropdown-item#fire:hover .circle,
 .dropdown-item#fire.selected .circle { background-color: var(--type-fire); }
-.dropdown-item#water:hover .circle,
 .dropdown-item#water.selected .circle { background-color: var(--type-water); }
-.dropdown-item#electric:hover .circle,
 .dropdown-item#electric.selected .circle { background-color: var(--type-electric); }
-.dropdown-item#grass:hover .circle,
 .dropdown-item#grass.selected .circle { background-color: var(--type-grass); }
-.dropdown-item#ice:hover .circle,
 .dropdown-item#ice.selected .circle { background-color: var(--type-ice); }
-.dropdown-item#fighting:hover .circle,
 .dropdown-item#fighting.selected .circle { background-color: var(--type-fighting); }
-.dropdown-item#poison:hover .circle,
 .dropdown-item#poison.selected .circle { background-color: var(--type-poison); }
-.dropdown-item#ground:hover .circle,
 .dropdown-item#ground.selected .circle { background-color: var(--type-ground); }
-.dropdown-item#flying:hover .circle,
 .dropdown-item#flying.selected .circle { background-color: var(--type-flying); }
-.dropdown-item#psychic:hover .circle,
 .dropdown-item#psychic.selected .circle { background-color: var(--type-psychic); }
-.dropdown-item#bug:hover .circle,
 .dropdown-item#bug.selected .circle { background-color: var(--type-bug); }
-.dropdown-item#rock:hover .circle,
 .dropdown-item#rock.selected .circle { background-color: var(--type-rock); }
-.dropdown-item#ghost:hover .circle,
 .dropdown-item#ghost.selected .circle { background-color: var(--type-ghost); }
-.dropdown-item#dragon:hover .circle,
 .dropdown-item#dragon.selected .circle { background-color: var(--type-dragon); }
-.dropdown-item#dark:hover .circle,
 .dropdown-item#dark.selected .circle { background-color: var(--type-dark); }
-.dropdown-item#steel:hover .circle,
 .dropdown-item#steel.selected .circle { background-color: var(--type-steel); }
-.dropdown-item#fairy:hover .circle,
 .dropdown-item#fairy.selected .circle { background-color: var(--type-fairy); }
 
 .dropdown-item:hover,

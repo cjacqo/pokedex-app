@@ -359,7 +359,7 @@ let PokemonDOMFactory = (function() {
     function createNavigation() {
       const navbar = document.getElementById('navContainer')
 
-      let navList, filterByTypeDropDownContainer
+      let navList, filterByTypeDropDownContainer, searchForm
 
       function makeNavList() {
         navList = document.createElement('ul')
@@ -413,6 +413,9 @@ let PokemonDOMFactory = (function() {
           filterByTypeButton.ariaHasPopup = true
           filterByTypeButton.ariaExpanded = true
           filterByTypeButton.innerText = 'Type'
+          let filterIcon = document.createElement('i')
+          filterIcon.classList.add('fa-solid', 'fa-filter')
+          filterByTypeButton.appendChild(filterIcon)
           filterByTypeDropDownContainer.appendChild(filterByTypeButton)
         }
         
@@ -443,25 +446,29 @@ let PokemonDOMFactory = (function() {
         navList.appendChild(filterByTypeDropDownContainer)
       }
 
+      function makeSearchBar() {
+        searchForm = document.createElement('form')
+        searchForm.classList.add('form-inline', 'my-2', 'my-lg-0')
+        let searchBar = document.createElement('input')
+        searchBar.classList.add('form-control', 'mr-sm-2')
+        searchBar.setAttribute('type', 'search')
+        searchBar.placeholder = 'Search'
+        searchBar.ariaLabel = 'Search'
+        searchBar.addEventListener('keyup', (e) => {
+          PokemonRespository.search(e)
+        })
+        searchForm.appendChild(searchBar)
+      }
+
+      function appendToNavBar() {
+        navbar.appendChild(searchForm)
+        navbar.appendChild(navList)
+      }
+
+      makeSearchBar()
       makeNavList()
       makeFilterByTypeList()
-
-      // Search bar
-      const searchForm = document.createElement('form')
-      searchForm.classList.add('form-inline', 'my-2', 'my-lg-0')
-      const searchBar = document.createElement('input')
-      searchBar.classList.add('form-control', 'mr-sm-2')
-      searchBar.setAttribute('type', 'search')
-      searchBar.placeholder = 'Search'
-      searchBar.ariaLabel = 'Search'
-      searchBar.addEventListener('keyup', (e) => {
-        PokemonRespository.search(e)
-      })
-      searchForm.appendChild(searchBar)
-
-      navbar.appendChild(searchForm)
-      navbar.appendChild(navList)
-
+      appendToNavBar()
     }
 
     // Empty Message
@@ -907,6 +914,19 @@ let PokemonRespository = (function() {
 
   function searchPokemon(e) {
     const { value } = e.target
+
+    function resetFilters() {
+      // Reset the type filters
+      filterPokemon(true)
+      // Loop over each filter list item and remove selected class
+      const selectedFilters = Array.from(document.querySelectorAll('.selected'))
+      selectedFilters.forEach(filter => filter.classList.remove('selected'))
+      // Set the selected filter to 'All'
+      const allFilter = document.getElementById('all')
+      allFilter.classList.add('selected')
+    }
+    resetFilters()
+    
     const pokemonCards = Array.from(document.querySelectorAll(`[data-pokemon]`))
     let hiddenCount = 0
     pokemonCards.forEach(card => {
