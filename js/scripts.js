@@ -526,27 +526,6 @@ let PokemonRespository = (function() {
   const apiUrlBuilder = (endpoint, idName) => `https://pokeapi.co/api/v2/${endpoint}/${idName}`
   const apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150'
   
-  function loadList() {
-    return fetch(apiUrl).then(function(response) {
-      return response.json()
-    }).then(function(json) {
-      json.results.forEach(function(item) {
-        let pokemon = {
-          name: item.name,
-          detailsUrl: item.url
-        }
-        // add(pokemon)
-        // return fetch(item.url).then(function(response) {
-        //   return response.json()
-        // }).then(function(json) {
-        //   console.log(json)
-        // })
-      })
-    }).catch(function(e) {
-      console.error(e)
-    })
-  }
-
   const loadPokemonPromise = new Promise((resolve, reject) => {
     fetch(apiUrl).then(res => res.json().then(res => {
       return res.results.map(p => {
@@ -571,28 +550,12 @@ let PokemonRespository = (function() {
     
   })
 
-  
-
   async function loadPokemon() {
     loadPokemonPromise.then(data => {
       data.forEach(pokemon => {
         pokemonList.push(pokemon)
         PokemonDOMFactory.createPokemon(pokemon)
       })
-    })
-  }
-
-  function loadBasicDetails(pokemon) {
-    let url = pokemon.detailsUrl
-    return fetch(url).then(function(response) {
-      return response.json()
-    }).then(function(details) {
-      pokemon.id = details.id
-      pokemon.imageUrl = details.sprites.front_default
-      pokemon.types = details.types
-      return pokemon
-    }).catch(function(e) {
-      console.error(e)
     })
   }
 
@@ -754,7 +717,6 @@ let PokemonRespository = (function() {
   return {
     init: loadPokemon,
     getDetails: {
-      basic: loadBasicDetails,
       card: loadCard
     },
     get pokemon() { return pokemonList }
