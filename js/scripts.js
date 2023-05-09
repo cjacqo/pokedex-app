@@ -500,7 +500,12 @@ let PokemonDOMFactory = (function() {
           DOMHelper.getSiblings(target).forEach(sibling => {
             if (sibling.classList.contains('selected')) sibling.classList.remove('selected')
           })
-          
+          let btn = document.getElementById('sortByBtn')
+          if (target.classList.contains('selected')) {
+            btn.innerText = `Sort By: ${target.id}`
+          } else {
+            btn.innerText = 'Sort By'
+          }
           PokemonRespository.sort(target.id, target.classList.contains('selected'))
           e.stopPropagation()
         }
