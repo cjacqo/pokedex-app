@@ -882,6 +882,8 @@ let PokemonRespository = (function() {
         if (card.classList.contains('hidden')) card.classList.remove('hidden')
         if (card.classList.contains('filtered')) card.classList.remove('filtered')
       })
+      let allFilter = document.getElementById('all')
+      allFilter.classList.add('selected')
     }
 
     function displayCards(arr, isVisible) {
@@ -927,12 +929,11 @@ let PokemonRespository = (function() {
 
         if (containsType(selectedTypes, typesArr)) visibleCards.push(pokemonCard)
         else hiddenCards.push(pokemonCard)
-
-        console.log(visibleCards)
         
-        displayCards(visibleCards, true)
-        displayCards(hiddenCards)
       })
+      displayCards(visibleCards, true)
+      displayCards(hiddenCards)
+      
     }
   }
 
