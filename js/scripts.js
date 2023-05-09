@@ -57,6 +57,27 @@ let PokemonDOMFactory = (function() {
       strsFromArr: getStrsFromArray
     }
   })()
+
+  const DOMHelper = (function() {
+    let getSiblings = function(e) {
+      let siblings = []
+      if (!e.parentNode) return siblings
+
+      let sibling = e.parentNode.firstChild
+
+      while (sibling) {
+        if (sibling.nodeType === 1 && sibling !== e) {
+          siblings.push(sibling)
+        }
+        sibling = sibling.nextSibling
+      }
+      return siblings
+    }
+
+    return {
+      getSiblings
+    }
+  })()
   
   // IIFE for common elements
   const DOMBuilder = (function() {
@@ -359,7 +380,7 @@ let PokemonDOMFactory = (function() {
     function createNavigation() {
       const navbar = document.getElementById('navContainer')
 
-      let navList, filterByTypeDropDownContainer, collapseBar, searchForm, togglerButton
+      let navList, togglerButton, collapseBar, searchForm, sortByDropDownContainer, filterByTypeDropDownContainer
 
       function makeNavList() {
         navList = document.createElement('ul')
@@ -413,6 +434,7 @@ let PokemonDOMFactory = (function() {
         // Filter By Type Drop Down Menu Button
         function makeFilterByTypeDropDownButton() {
           let filterByTypeButton = document.createElement('button')
+          filterByTypeButton.classList.add('dropdown-btn')
           filterByTypeButton.setAttribute('id', 'filterByTypeBtn')
           filterByTypeButton.setAttribute('type', 'button')
           filterByTypeButton.dataset.toggle = 'dropdown'
@@ -466,6 +488,54 @@ let PokemonDOMFactory = (function() {
         searchForm.appendChild(searchBar)
       }
 
+      function makeSort() {
+        sortByDropDownContainer = document.createElement('div')
+        sortByDropDownContainer.classList.add('dropdown')
+        sortByDropDownContainer.setAttribute('id', 'sortDropDownContainer')
+
+        function handleSortSelection(e) {
+          e.preventDefault()
+          const { target } = e
+          target.classList.toggle('selected')
+          DOMHelper.getSiblings(target).forEach(sibling => {
+            if (sibling.classList.contains('selected')) sibling.classList.remove('selected')
+          })
+          
+          PokemonRespository.sort(target.id, target.classList.contains('selected'))
+          e.stopPropagation()
+        }
+
+        function makeSortByDropDownButton() {
+          let sortByButton = document.createElement('button')
+          sortByButton.classList.add('dropdown-btn')
+          sortByButton.setAttribute('id', 'sortByBtn')
+          sortByButton.setAttribute('type', 'button')
+          sortByButton.dataset.toggle = 'dropdown'
+          sortByButton.ariaHasPopup = true
+          sortByButton.ariaExpanded = true
+          sortByButton.innerText = 'Sort By'
+          sortByDropDownContainer.appendChild(sortByButton)
+        }
+
+        function makeSoryByListItems() {
+          let sortByList = document.createElement('div')
+          sortByList.classList.add('dropdown-menu')
+          sortByList.ariaLabel = 'sortByBtn'
+
+          let types = ['A-Z', 'Z-A']
+
+          types.forEach(type => {
+            sortByList.appendChild(makeDropDownListItem(type, ['sort-filter'], false, handleSortSelection))
+          })
+
+          sortByDropDownContainer.appendChild(sortByList)
+        }
+
+        makeSortByDropDownButton()
+        makeSoryByListItems()
+        navList.appendChild(sortByDropDownContainer)
+      }
+
       function makeToggler() {
         togglerButton = document.createElement('button')
         togglerButton.classList.add('navbar-toggler')
@@ -491,6 +561,7 @@ let PokemonDOMFactory = (function() {
       makeToggler()
       makeSearchBar()
       makeNavList()
+      makeSort()
       makeFilterByTypeList()
       appendToNavBar()
     }
@@ -507,6 +578,7 @@ let PokemonDOMFactory = (function() {
       const cardContainer = document.createElement('div')
       cardContainer.classList.add('border-dark', 'pokemon-card', 'text-white', 'bg-dark')
       cardContainer.setAttribute('data-pokemon', name)
+      cardContainer.setAttribute('data-pokemon-id', pokemon.id)
 
       const imgContainer = document.createElement('div')
       imgContainer.classList.add('img-container')
@@ -971,6 +1043,35 @@ let PokemonRespository = (function() {
     }
   }
 
+  function clearPokemonCardsContainer() {
+    const pokemonCardsContainer = document.getElementById('pokemonCardsContainer').children[0]
+    while (pokemonCardsContainer.children.length > 0) {
+      pokemonCardsContainer.children[0].remove()
+    }
+  }
+
+  function populatePokemonCardsContainer(cards) {
+    const pokemonCardsContainer = document.getElementById('pokemonCardsContainer').children[0]
+    cards.forEach(card => pokemonCardsContainer.appendChild(card))
+  }
+
+  function sortPokemon(sortBy, isSelected) {
+    let allCards = Array.from(document.querySelectorAll('[data-pokemon]'))
+    let newSort
+    if (isSelected) {
+      newSort = allCards.sort((cardA, cardB) => {
+        if (sortBy === 'A-Z') return cardA.dataset.pokemon > cardB.dataset.pokemon
+        else if (sortBy === 'Z-A') return cardA.dataset.pokemon < cardB.dataset.pokemon
+      })
+    } else {
+      newSort = allCards.sort((cardA, cardB) => {
+        return parseInt(cardA.dataset.pokemonId) > parseInt(cardB.dataset.pokemonId)
+      })
+    }
+    clearPokemonCardsContainer()
+    populatePokemonCardsContainer(newSort)
+  }
+
   return {
     init: loadPokemon,
     getDetails: {
@@ -978,6 +1079,7 @@ let PokemonRespository = (function() {
     },
     filter: filterPokemon,
     search: searchPokemon,
+    sort: sortPokemon,
     get pokemon() { return pokemonList }
   }
 })()

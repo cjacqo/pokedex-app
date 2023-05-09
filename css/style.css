@@ -153,7 +153,7 @@ form {
   width: 95%;
   margin: 0 auto;
 }
-#filterByTypeBtn {
+.dropdown-btn {
   background-color: transparent;
   border: none;
   outline: none;
@@ -167,13 +167,15 @@ form {
   padding: 1rem 0;
   padding-left: 1rem;
 }
-#filterByTypeBtn[aria-expanded='true'] {
+.dropdown-btn[aria-expanded='true'] {
   background-color: rgba(255, 255, 255, 0.25);
 }
 .dropdown-menu {
   width: 100%;
-  transform: translate3d(0px, 30px, 0px);
+  transform: translate3d(0px, 0px, 0px) !important;
+  /* transform: translate3d(0px, 30px, 0px); */
   background-color: transparent;
+  position: relative !important;
 }
 .dropdown-item {
   display: flex;
