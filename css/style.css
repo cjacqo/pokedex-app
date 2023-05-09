@@ -138,92 +138,100 @@ p {
 }
 
 .navbar-nav {
-  align-items: center;
+  /* align-items: center; */
   padding-top: 1rem;
   padding-bottom: 1rem;
   overflow-y: auto;
   height: 100vh;
   gap: 5px;
 }
-.nav-item {
-  width: 80%;
-  padding: 0.5rem;
+.dropdown-menu {
+  width: 100%;
+  transform: translate3d(0px, 30px, 0px);
+  background-color: transparent;
+}
+.dropdown-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   cursor: pointer;
   border-radius: 5px;
-  /* border: 1px solid; */
   transition: all 0.25s ease-in;
 }
-.nav-item .circle {
+.dropdown-item .circle {
   display: inline-block;
   width: 20px;
   height: 20px;
   border-radius: 50%;
   border: 3px solid;
 }
-.nav-item#all .circle {
+.dropdown-item#all .circle {
   border-color: white;
 }
-.nav-item.selected#all .circle {
+.dropdown-item.selected#all .circle {
   background-color: white;
 }
-.nav-item.normal .circle { border-color: var(--type-normal); }
-.nav-item.fire .circle { border-color: var(--type-fire); }
-.nav-item.water .circle { border-color: var(--type-water); }
-.nav-item.electric .circle { border-color: var(--type-electric); }
-.nav-item.grass .circle { border-color: var(--type-grass); }
-.nav-item.ice .circle { border-color: var(--type-ice); }
-.nav-item.fighting .circle { border-color: var(--type-fighting); }
-.nav-item.poison .circle { border-color: var(--type-poison); }
-.nav-item.ground .circle { border-color: var(--type-ground); }
-.nav-item.flying .circle { border-color: var(--type-flying); }
-.nav-item.psychic .circle { border-color: var(--type-psychic); }
-.nav-item.bug .circle { border-color: var(--type-bug); }
-.nav-item.rock .circle { border-color: var(--type-rock); }
-.nav-item.ghost .circle { border-color: var(--type-ghost); }
-.nav-item.dragon .circle { border-color: var(--type-dragon); }
-.nav-item.dark .circle { border-color: var(--type-dark); }
-.nav-item.steel .circle { border-color: var(--type-steel); }
-.nav-item.fairy .circle { border-color: var(--type-fairy); }
+.dropdown-item#normal .circle { border-color: var(--type-normal); }
+.dropdown-item#fire .circle { border-color: var(--type-fire); }
+.dropdown-item#water .circle { border-color: var(--type-water); }
+.dropdown-item#electric .circle { border-color: var(--type-electric); }
+.dropdown-item#grass .circle { border-color: var(--type-grass); }
+.dropdown-item#ice .circle { border-color: var(--type-ice); }
+.dropdown-item#fighting .circle { border-color: var(--type-fighting); }
+.dropdown-item#poison .circle { border-color: var(--type-poison); }
+.dropdown-item#ground .circle { border-color: var(--type-ground); }
+.dropdown-item#flying .circle { border-color: var(--type-flying); }
+.dropdown-item#psychic .circle { border-color: var(--type-psychic); }
+.dropdown-item#bug .circle { border-color: var(--type-bug); }
+.dropdown-item#rock .circle { border-color: var(--type-rock); }
+.dropdown-item#ghost .circle { border-color: var(--type-ghost); }
+.dropdown-item#dragon .circle { border-color: var(--type-dragon); }
+.dropdown-item#dark .circle { border-color: var(--type-dark); }
+.dropdown-item#steel .circle { border-color: var(--type-steel); }
+.dropdown-item#fairy .circle { border-color: var(--type-fairy); }
 
-.nav-item.normal:hover .circle,
-.nav-item.normal.selected .circle { background-color: var(--type-normal); }
-.nav-item.fire:hover .circle,
-.nav-item.fire.selected .circle { background-color: var(--type-fire); }
-.nav-item.water:hover .circle,
-.nav-item.water.selected .circle { background-color: var(--type-water); }
-.nav-item.electric:hover .circle,
-.nav-item.electric.selected .circle { background-color: var(--type-electric); }
-.nav-item.grass:hover .circle,
-.nav-item.grass.selected .circle { background-color: var(--type-grass); }
-.nav-item.ice:hover .circle,
-.nav-item.ice.selected .circle { background-color: var(--type-ice); }
-.nav-item.fighting:hover .circle,
-.nav-item.fighting.selected .circle { background-color: var(--type-fighting); }
-.nav-item.poison:hover .circle,
-.nav-item.poison.selected .circle { background-color: var(--type-poison); }
-.nav-item.ground:hover .circle,
-.nav-item.ground.selected .circle { background-color: var(--type-ground); }
-.nav-item.flying:hover .circle,
-.nav-item.flying.selected .circle { background-color: var(--type-flying); }
-.nav-item.psychic:hover .circle,
-.nav-item.psychic.selected .circle { background-color: var(--type-psychic); }
-.nav-item.bug:hover .circle,
-.nav-item.bug.selected .circle { background-color: var(--type-bug); }
-.nav-item.rock:hover .circle,
-.nav-item.rock.selected .circle { background-color: var(--type-rock); }
-.nav-item.ghost:hover .circle,
-.nav-item.ghost.selected .circle { background-color: var(--type-ghost); }
-.nav-item.dragon:hover .circle,
-.nav-item.dragon.selected .circle { background-color: var(--type-dragon); }
-.nav-item.dark:hover .circle,
-.nav-item.dark.selected .circle { background-color: var(--type-dark); }
-.nav-item.steel:hover .circle,
-.nav-item.steel.selected .circle { background-color: var(--type-steel); }
-.nav-item.fairy:hover .circle,
-.nav-item.fairy.selected .circle { background-color: var(--type-fairy); }
+.dropdown-item#normal:hover .circle,
+.dropdown-item#normal.selected .circle { background-color: var(--type-normal); }
+.dropdown-item#fire:hover .circle,
+.dropdown-item#fire.selected .circle { background-color: var(--type-fire); }
+.dropdown-item#water:hover .circle,
+.dropdown-item#water.selected .circle { background-color: var(--type-water); }
+.dropdown-item#electric:hover .circle,
+.dropdown-item#electric.selected .circle { background-color: var(--type-electric); }
+.dropdown-item#grass:hover .circle,
+.dropdown-item#grass.selected .circle { background-color: var(--type-grass); }
+.dropdown-item#ice:hover .circle,
+.dropdown-item#ice.selected .circle { background-color: var(--type-ice); }
+.dropdown-item#fighting:hover .circle,
+.dropdown-item#fighting.selected .circle { background-color: var(--type-fighting); }
+.dropdown-item#poison:hover .circle,
+.dropdown-item#poison.selected .circle { background-color: var(--type-poison); }
+.dropdown-item#ground:hover .circle,
+.dropdown-item#ground.selected .circle { background-color: var(--type-ground); }
+.dropdown-item#flying:hover .circle,
+.dropdown-item#flying.selected .circle { background-color: var(--type-flying); }
+.dropdown-item#psychic:hover .circle,
+.dropdown-item#psychic.selected .circle { background-color: var(--type-psychic); }
+.dropdown-item#bug:hover .circle,
+.dropdown-item#bug.selected .circle { background-color: var(--type-bug); }
+.dropdown-item#rock:hover .circle,
+.dropdown-item#rock.selected .circle { background-color: var(--type-rock); }
+.dropdown-item#ghost:hover .circle,
+.dropdown-item#ghost.selected .circle { background-color: var(--type-ghost); }
+.dropdown-item#dragon:hover .circle,
+.dropdown-item#dragon.selected .circle { background-color: var(--type-dragon); }
+.dropdown-item#dark:hover .circle,
+.dropdown-item#dark.selected .circle { background-color: var(--type-dark); }
+.dropdown-item#steel:hover .circle,
+.dropdown-item#steel.selected .circle { background-color: var(--type-steel); }
+.dropdown-item#fairy:hover .circle,
+.dropdown-item#fairy.selected .circle { background-color: var(--type-fairy); }
 
-.nav-item:hover,
-.nav-item.selected { background-color: rgba(255, 255, 255, 0.05); }
+.dropdown-item:hover,
+.dropdown-item.selected {
+  background-color: rgba(255, 255, 255, 0.05);
+  color: #FFF;
+}
 
 .scroll-y {
   overflow-y: auto;

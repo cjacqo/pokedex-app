@@ -359,45 +359,92 @@ let PokemonDOMFactory = (function() {
     function createNavigation() {
       const navbar = document.getElementById('navContainer')
 
-      // Collapse div
-      // const collapseDiv = createContainer('collapse', 'navbar-collapse')
-      // List
-      const navList = document.createElement('ul')
-      navList.classList.add('navbar-nav', 'mr-auto')
-      // List items (types)
-      let types = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy']
-      types = types.sort((a, b) => a > b)
-      const listItemAll = document.createElement('li')
-      listItemAll.classList.add('nav-item', 'type-filter', 'white-font', 'flex', 'jc-sb', 'ai-c', 'selected')
-      listItemAll.setAttribute('id', 'all')
-      listItemAll.innerText = 'All'
-      listItemAll.addEventListener('click', (e) => {
-        e.preventDefault()
-        let listItemTypes = Array.from(document.querySelectorAll('.type-selection'))
-        if (!listItemAll.classList.contains('selected')) listItemAll.classList.add('selected')
-        listItemTypes.forEach(listItem => {
-          if (listItem.classList.contains('selected')) listItem.classList.remove('selected')
-        })
-        PokemonRespository.filter(true)
-      })
-      const listItemAllCircle = document.createElement('span')
-      listItemAllCircle.classList.add('circle')
-      listItemAll.appendChild(listItemAllCircle)
-      navList.appendChild(listItemAll)
-      types.forEach(type => {
-        const listItem = document.createElement('li')
-        listItem.classList.add('nav-item', 'type-filter', 'type-selection', type, 'white-font', 'flex', 'jc-sb', 'ai-c')
-        listItem.innerText = StrHelpers.capitalize(type)
-        const listItemCircle = document.createElement('span')
-        listItemCircle.classList.add('circle')
-        listItem.appendChild(listItemCircle)
-        listItem.addEventListener('click', (e) => {
+      let navList, filterByTypeDropDownContainer
+
+      function makeNavList() {
+        navList = document.createElement('ul')
+        navList.classList.add('navbar-nav', 'mr-auto')
+      }
+
+      function makeDropDownListItem(text, classNames, createCircle, eventListener) {
+        let listItem = document.createElement('li')
+        listItem.classList.add('dropdown-item', 'white-font')
+        classNames.forEach(className => listItem.classList.add(className))
+        listItem.setAttribute('id', text)
+        listItem.innerText = StrHelpers.capitalize(text)
+        if (createCircle) {
+          let listItemCircle = document.createElement('span')
+          listItemCircle.classList.add('circle')
+          listItem.appendChild(listItemCircle)
+        }
+        listItem.addEventListener('click', (e) => eventListener(e, text === 'all'))
+        return listItem
+      }
+
+      function makeFilterByTypeList() {
+        filterByTypeDropDownContainer = document.createElement('div')
+        filterByTypeDropDownContainer.classList.add('dropdown')
+        filterByTypeDropDownContainer.setAttribute('id', 'filterDropDownContainer')
+
+        // Callback Function Event Listener
+        function handleFilterSelection(e, isAll) {
           e.preventDefault()
-          listItem.classList.toggle('selected')
-          PokemonRespository.filter()
-        })
-        navList.appendChild(listItem)
-      })
+          const { target } = e
+          let filterAll = isAll
+          if (filterAll) {
+            let listItemTypes = Array.from(document.querySelectorAll('.type-selection'))
+            if (!target.classList.contains('selected')) target.classList.add('selected')
+            listItemTypes.forEach(listItem => {
+              if (listItem.classList.contains('selected')) listItem.classList.remove('selected')
+            })
+          } else {
+            target.classList.toggle('selected')
+          }
+          PokemonRespository.filter(filterAll)
+          e.stopPropagation()
+        }
+        
+        // Filter By Type Drop Down Menu Button
+        function makeFilterByTypeDropDownButton() {
+          let filterByTypeButton = document.createElement('button')
+          filterByTypeButton.setAttribute('id', 'filterByTypeBtn')
+          filterByTypeButton.setAttribute('type', 'button')
+          filterByTypeButton.dataset.toggle = 'dropdown'
+          filterByTypeButton.ariaHasPopup = true
+          filterByTypeButton.ariaExpanded = true
+          filterByTypeButton.innerText = 'Type'
+          filterByTypeDropDownContainer.appendChild(filterByTypeButton)
+        }
+        
+        // Make List Items for Drop Down Menu
+        function makeFilterByTypeListItems() {
+          let filterByTypeList = document.createElement('div')
+          filterByTypeList.classList.add('dropdown-menu')
+          filterByTypeList.ariaLabel = 'filterByTypeBtn'
+
+          // Create a 'All' filter list item
+          let filterByAllListItem = makeDropDownListItem('all', ['type-filter'], true, handleFilterSelection)
+          filterByAllListItem.classList.add('selected')
+          filterByTypeList.appendChild(filterByAllListItem)
+
+          let types = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy']
+          types = types.sort((a, b) => a > b)
+
+          // Loop over pokemon types to create dropdown menu list items
+          types.forEach(type => {
+            filterByTypeList.appendChild(makeDropDownListItem(type, ['type-filter', 'type-selection'], true, handleFilterSelection))
+          })
+
+          filterByTypeDropDownContainer.appendChild(filterByTypeList)
+        }
+
+        makeFilterByTypeDropDownButton()
+        makeFilterByTypeListItems()
+        navList.appendChild(filterByTypeDropDownContainer)
+      }
+
+      makeNavList()
+      makeFilterByTypeList()
 
       // Search bar
       const searchForm = document.createElement('form')
@@ -411,10 +458,6 @@ let PokemonDOMFactory = (function() {
         PokemonRespository.search(e)
       })
       searchForm.appendChild(searchBar)
-
-      // collapseDiv.appendChild(navList)
-      // collapseDiv.appendChild(searchForm)
-      // navbar.appendChild(collapseDiv)
 
       navbar.appendChild(searchForm)
       navbar.appendChild(navList)
