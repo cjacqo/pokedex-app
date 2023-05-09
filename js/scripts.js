@@ -475,25 +475,41 @@ let PokemonDOMFactory = (function() {
   
   // Create Element: Pokemon Card Item
   function createPokemonCard(pokemon) {
-    // Deconstruct the pokemon object being passed
-    PokemonRespository.getDetails.basic(pokemon).then(function() {
-      const { name, imageUrl, types } = pokemon
+    const { name, imageUrl, types } = pokemon
 
-      const pokemonCard = document.createElement('div')
-      pokemonCard.classList.add('pokemon-card', 'list-group-item')
-      // pokemonCard.classList.add('pokemon-card', 'flex', 'col', 'jc-c')
-      pokemonCard.setAttribute('data-pokemon', name)
-      const nameTypesBar = DOMBuilder.cardHeader(name, types)
-      const imgElement = DOMBuilder.image(imageUrl)
+    const pokemonCard = document.createElement('div')
+    pokemonCard.classList.add('pokemon-card', 'list-group-item')
+    // pokemonCard.classList.add('pokemon-card', 'flex', 'col', 'jc-c')
+    pokemonCard.setAttribute('data-pokemon', name)
+    const nameTypesBar = DOMBuilder.cardHeader(name, types)
+    const imgElement = DOMBuilder.image(imageUrl)
 
-      pokemonCard.addEventListener('click', function() {
-        ModalBuilder.show(pokemon)
-      })
-
-      pokemonCard.appendChild(nameTypesBar)
-      pokemonCard.appendChild(imgElement)
-      pokemonCardsContainer.appendChild(pokemonCard)
+    pokemonCard.addEventListener('click', function() {
+      ModalBuilder.show(pokemon)
     })
+
+    pokemonCard.appendChild(nameTypesBar)
+    pokemonCard.appendChild(imgElement)
+    pokemonCardsContainer.appendChild(pokemonCard)
+    // Deconstruct the pokemon object being passed
+    // PokemonRespository.getDetails.basic(pokemon).then(function() {
+    //   const { name, imageUrl, types } = pokemon
+
+    //   const pokemonCard = document.createElement('div')
+    //   pokemonCard.classList.add('pokemon-card', 'list-group-item')
+    //   // pokemonCard.classList.add('pokemon-card', 'flex', 'col', 'jc-c')
+    //   pokemonCard.setAttribute('data-pokemon', name)
+    //   const nameTypesBar = DOMBuilder.cardHeader(name, types)
+    //   const imgElement = DOMBuilder.image(imageUrl)
+
+    //   pokemonCard.addEventListener('click', function() {
+    //     ModalBuilder.show(pokemon)
+    //   })
+
+    //   pokemonCard.appendChild(nameTypesBar)
+    //   pokemonCard.appendChild(imgElement)
+    //   pokemonCardsContainer.appendChild(pokemonCard)
+    // })
   }
 
   return {
@@ -505,6 +521,7 @@ let PokemonDOMFactory = (function() {
 let PokemonRespository = (function() {
   // Empty array of pokemon
   const pokemonList = []
+  const pokemonMap = new Map()
   // API URL
   const apiUrlBuilder = (endpoint, idName) => `https://pokeapi.co/api/v2/${endpoint}/${idName}`
   const apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150'
@@ -518,10 +535,50 @@ let PokemonRespository = (function() {
           name: item.name,
           detailsUrl: item.url
         }
-        add(pokemon)
+        // add(pokemon)
+        // return fetch(item.url).then(function(response) {
+        //   return response.json()
+        // }).then(function(json) {
+        //   console.log(json)
+        // })
       })
     }).catch(function(e) {
       console.error(e)
+    })
+  }
+
+  const loadPokemonPromise = new Promise((resolve, reject) => {
+    fetch(apiUrl).then(res => res.json().then(res => {
+      return res.results.map(p => {
+        return {
+          name: p.name,
+          detailsUrl: p.url
+        }
+      })
+    })).then(res => {
+      return res.map(p => {
+        let pokemon = fetch(p.detailsUrl).then(res => res.json().then(res => {
+          p.id = res.id
+          p.imageUrl = res.sprites.front_default
+          p.types = res.types
+          return p
+        }))
+        return pokemon
+      })
+    }).then(res => {
+      return Promise.all(res).then(v => resolve(v))
+    })
+    
+  })
+
+  
+
+  async function loadPokemon() {
+    loadPokemonPromise.then(data => {
+      data.forEach(pokemon => {
+        pokemonList.push(pokemon)
+        PokemonDOMFactory.createPokemon(pokemon)
+      })
     })
   }
 
@@ -533,6 +590,7 @@ let PokemonRespository = (function() {
       pokemon.id = details.id
       pokemon.imageUrl = details.sprites.front_default
       pokemon.types = details.types
+      return pokemon
     }).catch(function(e) {
       console.error(e)
     })
@@ -693,12 +751,8 @@ let PokemonRespository = (function() {
                             .then(getMovesLibrary)
   }
 
-
-
-  function add(pokemon) { pokemonList.push(pokemon) }
-
   return {
-    init: loadList,
+    init: loadPokemon,
     getDetails: {
       basic: loadBasicDetails,
       card: loadCard
@@ -707,8 +761,4 @@ let PokemonRespository = (function() {
   }
 })()
 
-PokemonRespository.init().then(function() {
-  PokemonRespository.pokemon.forEach(function(pokemon) {
-    PokemonDOMFactory.createPokemon(pokemon)
-  })
-})
+PokemonRespository.init()
