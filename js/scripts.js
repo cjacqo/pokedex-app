@@ -359,11 +359,17 @@ let PokemonDOMFactory = (function() {
     function createNavigation() {
       const navbar = document.getElementById('navContainer')
 
-      let navList, filterByTypeDropDownContainer, searchForm
+      let navList, filterByTypeDropDownContainer, collapseBar, searchForm, togglerButton
 
       function makeNavList() {
         navList = document.createElement('ul')
         navList.classList.add('navbar-nav', 'mr-auto')
+      }
+
+      function makeCollapseBar() {
+        collapseBar = document.createElement('div')
+        collapseBar.classList.add('collapse', 'navbar-collapse')
+        collapseBar.setAttribute('id', 'navbarContainer')
       }
 
       function makeDropDownListItem(text, classNames, createCircle, eventListener) {
@@ -460,11 +466,29 @@ let PokemonDOMFactory = (function() {
         searchForm.appendChild(searchBar)
       }
 
-      function appendToNavBar() {
-        navbar.appendChild(searchForm)
-        navbar.appendChild(navList)
+      function makeToggler() {
+        togglerButton = document.createElement('button')
+        togglerButton.classList.add('navbar-toggler')
+        togglerButton.setAttribute('type', 'button')
+        togglerButton.dataset.toggle = 'collapse'
+        togglerButton.dataset.target = '#navbarContainer'
+        togglerButton.setAttribute('aria-controls', 'navbarContainer')
+        togglerButton.ariaExpanded = false
+        togglerButton.ariaLabel = 'Toggle navigation'
+        let togglerIcon = document.createElement('span')
+        togglerIcon.classList.add('navbar-toggler-icon')
+        togglerButton.appendChild(togglerIcon)
       }
 
+      function appendToNavBar() {
+        collapseBar.appendChild(searchForm)
+        collapseBar.appendChild(navList)
+        navbar.appendChild(togglerButton)
+        navbar.appendChild(collapseBar)
+      }
+
+      makeCollapseBar()
+      makeToggler()
       makeSearchBar()
       makeNavList()
       makeFilterByTypeList()
