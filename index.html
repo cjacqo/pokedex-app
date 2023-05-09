@@ -11,10 +11,13 @@
   <script src="js/fetch-polyfill.js" defer="defer"></script>
   <script src="js/scripts.js" defer="defer"></script>
 </head>
-<body>
-  <nav class="navbar navbar-expand-lg navbar-light bg-light" id="navContainer"></nav>
+<body class="container-fluid">
+  <div class="row full-height row-content">
+    <!-- <nav class="col-1 navbar navbar-expand-lg navbar-dark bg-dark sticky-top" id="navContainer"></nav> -->
+    <div class="navbar-dark bg-dark flex-column" id="navContainer"></div>
+    <div class="col" id="pokemonCardsContainer"></div>
+  </div>
 
-  <div class="list-group" id="pokemonCardsContainer"></div>
 
   <!-- Modal Container -->
   <div id="modal-container"></div>

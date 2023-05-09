@@ -3,7 +3,9 @@ let PokemonDOMFactory = (function() {
 
   // DOM Element: Container of Pokemon
   const pokemonCardsContainer = document.getElementById('pokemonCardsContainer')
-
+  const row = document.createElement('div')
+  row.classList.add('row', 'justify-content-center', 'scroll-y')
+  pokemonCardsContainer.appendChild(row)
   // IIFE for string helpers
   const StrHelpers = (function() {
     // Capitalize String Helper
@@ -358,28 +360,37 @@ let PokemonDOMFactory = (function() {
       const navbar = document.getElementById('navContainer')
 
       // Collapse div
-      const collapseDiv = createContainer('collapse', 'navbar-collapse')
+      // const collapseDiv = createContainer('collapse', 'navbar-collapse')
       // List
       const navList = document.createElement('ul')
       navList.classList.add('navbar-nav', 'mr-auto')
       // List items (types)
-      const types = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy']
+      let types = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy']
+      types = types.sort((a, b) => a > b)
       const listItemAll = document.createElement('li')
-      listItemAll.classList.add('nav-item', 'type-filter')
+      listItemAll.classList.add('nav-item', 'type-filter', 'white-font', 'flex', 'jc-sb', 'ai-c', 'selected')
+      listItemAll.setAttribute('id', 'all')
       listItemAll.innerText = 'All'
       listItemAll.addEventListener('click', (e) => {
         e.preventDefault()
         let listItemTypes = Array.from(document.querySelectorAll('.type-selection'))
+        if (!listItemAll.classList.contains('selected')) listItemAll.classList.add('selected')
         listItemTypes.forEach(listItem => {
           if (listItem.classList.contains('selected')) listItem.classList.remove('selected')
         })
         PokemonRespository.filter(true)
       })
+      const listItemAllCircle = document.createElement('span')
+      listItemAllCircle.classList.add('circle')
+      listItemAll.appendChild(listItemAllCircle)
       navList.appendChild(listItemAll)
       types.forEach(type => {
         const listItem = document.createElement('li')
-        listItem.classList.add('nav-item', 'type-filter', 'type-selection', type)
+        listItem.classList.add('nav-item', 'type-filter', 'type-selection', type, 'white-font', 'flex', 'jc-sb', 'ai-c')
         listItem.innerText = StrHelpers.capitalize(type)
+        const listItemCircle = document.createElement('span')
+        listItemCircle.classList.add('circle')
+        listItem.appendChild(listItemCircle)
         listItem.addEventListener('click', (e) => {
           e.preventDefault()
           listItem.classList.toggle('selected')
@@ -401,15 +412,56 @@ let PokemonDOMFactory = (function() {
       })
       searchForm.appendChild(searchBar)
 
-      collapseDiv.appendChild(navList)
-      collapseDiv.appendChild(searchForm)
-      navbar.appendChild(collapseDiv)
+      // collapseDiv.appendChild(navList)
+      // collapseDiv.appendChild(searchForm)
+      // navbar.appendChild(collapseDiv)
+
+      navbar.appendChild(searchForm)
+      navbar.appendChild(navList)
 
     }
 
+    // Empty Message
     function createEmptyMessage() {
       const element = createTextContainer(['nothing-found-container'], 'h5', 'No pokemon')
       document.body.appendChild(element)
+    }
+
+    // Pokemon Card
+    function createPokemonCard(pokemon) {
+      const { name, imageUrl, types } = pokemon
+      const cardContainer = document.createElement('div')
+      cardContainer.classList.add('border-dark', 'pokemon-card', 'text-white', 'bg-dark')
+      cardContainer.setAttribute('data-pokemon', name)
+
+      const imgContainer = document.createElement('div')
+      imgContainer.classList.add('img-container')
+      const imgElement = document.createElement('img')
+      imgElement.classList.add('card-img-top')
+      imgElement.setAttribute('src', imageUrl)
+      imgContainer.appendChild(imgElement)
+
+      const cardBody = document.createElement('div')
+      cardBody.classList.add('card-body')
+
+      const cardTitle = document.createElement('h5')
+      cardTitle.classList.add('card-title')
+      cardTitle.innerText = StrHelpers.capitalize(name)
+
+      const cardText = document.createElement('p')
+      cardText.classList.add('card-text')
+      types.forEach(type => {
+        let typeElement = document.createElement('span')
+        typeElement.classList.add('type-circle', type.type.name)
+        cardText.appendChild(typeElement)
+      })
+
+      cardBody.appendChild(cardTitle)
+      cardBody.appendChild(cardText)
+
+      cardContainer.appendChild(imgContainer)
+      cardContainer.appendChild(cardBody)
+      return cardContainer
     }
     
     return {
@@ -423,7 +475,8 @@ let PokemonDOMFactory = (function() {
       evolutionsContent: createEvolutionsContent,
       movesContent: createMovesContent,
       navigation: createNavigation,
-      emptyMessage: createEmptyMessage
+      emptyMessage: createEmptyMessage,
+      pokemonCard: createPokemonCard
     }
   })()
 
@@ -536,22 +589,11 @@ let PokemonDOMFactory = (function() {
   
   // Create Element: Pokemon Card Item
   function createPokemonCard(pokemon) {
-    const { name, imageUrl, types } = pokemon
-
-    const pokemonCard = document.createElement('div')
-    pokemonCard.classList.add('pokemon-card', 'list-group-item')
-    // pokemonCard.classList.add('pokemon-card', 'flex', 'col', 'jc-c')
-    pokemonCard.setAttribute('data-pokemon', name)
-    const nameTypesBar = DOMBuilder.cardHeader(name, types)
-    const imgElement = DOMBuilder.image(imageUrl)
-
-    pokemonCard.addEventListener('click', function() {
+    const card = DOMBuilder.pokemonCard(pokemon)
+    card.addEventListener('click', function() {
       ModalBuilder.show(pokemon)
     })
-
-    pokemonCard.appendChild(nameTypesBar)
-    pokemonCard.appendChild(imgElement)
-    pokemonCardsContainer.appendChild(pokemonCard)
+    row.appendChild(card)
   }
 
   return {
@@ -790,6 +832,8 @@ let PokemonRespository = (function() {
     if (displayAll) {
       return displayAllCards()
     } else {
+      const allListItem = document.getElementById('all')
+      if (allListItem.classList.contains('selected')) allListItem.classList.remove('selected')
       let visibleCards = []
       let hiddenCards = []
 
@@ -810,6 +854,8 @@ let PokemonRespository = (function() {
         if (containsType(selectedTypes, typesArr)) visibleCards.push(pokemonCard)
         else hiddenCards.push(pokemonCard)
 
+        console.log(visibleCards)
+        
         displayCards(visibleCards, true)
         displayCards(hiddenCards)
       })
