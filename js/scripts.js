@@ -456,7 +456,7 @@ let PokemonDOMFactory = (function() {
         searchForm = document.createElement('form')
         searchForm.classList.add('form-inline', 'my-2', 'my-lg-0')
         let searchBar = document.createElement('input')
-        searchBar.classList.add('form-control', 'mr-sm-2')
+        searchBar.classList.add('form-control')
         searchBar.setAttribute('type', 'search')
         searchBar.placeholder = 'Search'
         searchBar.ariaLabel = 'Search'
