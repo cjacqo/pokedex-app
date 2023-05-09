@@ -240,10 +240,11 @@ form {
   color: #FFF;
 }
 
-.scroll-y {
+#pokemonCardsContainer {
   overflow-y: auto;
   height: 100vh;
   padding: 1rem 0;
+  position: relative;
 }
 
 .pokemon-card {
