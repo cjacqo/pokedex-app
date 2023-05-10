@@ -277,40 +277,58 @@ span[data-type='fairy'] { background-color: var(--type-fairy); }
 .dropdown-item[data-pokemon-type='steel'] .circle { border-color: var(--type-steel); }
 .dropdown-item[data-pokemon-type='fairy'] .circle { border-color: var(--type-fairy); }
 
+.progress-bar[data-main-type-bg='normal'],
 .dropdown-item[data-pokemon-type='normal'].selected .circle,
 .circle.normal.selected { background-color: var(--type-normal); }
+.progress-bar[data-main-type-bg='fire'],
 .dropdown-item[data-pokemon-type='fire'].selected .circle,
 .circle.fire.selected { background-color: var(--type-fire); }
+.progress-bar[data-main-type-bg='water'],
 .dropdown-item[data-pokemon-type='water'].selected .circle,
 .circle.water.selected { background-color: var(--type-water); }
+.progress-bar[data-main-type-bg='electric'],
 .dropdown-item[data-pokemon-type='electric'].selected .circle,
 .circle.electric.selected { background-color: var(--type-electric); }
+.progress-bar[data-main-type-bg='grass'],
 .dropdown-item[data-pokemon-type='grass'].selected .circle,
 .circle.grass.selected { background-color: var(--type-grass); }
+.progress-bar[data-main-type-bg='ice'],
 .dropdown-item[data-pokemon-type='ice'].selected .circle,
 .circle.ice.selected { background-color: var(--type-ice); }
+.progress-bar[data-main-type-bg='fighting'],
 .dropdown-item[data-pokemon-type='fighting'].selected .circle,
 .circle.fighting.selected { background-color: var(--type-fighting); }
+.progress-bar[data-main-type-bg='poison'],
 .dropdown-item[data-pokemon-type='poison'].selected .circle,
 .circle.poison.selected { background-color: var(--type-poison); }
+.progress-bar[data-main-type-bg='ground'],
 .dropdown-item[data-pokemon-type='ground'].selected .circle,
 .circle.ground.selected { background-color: var(--type-ground); }
+.progress-bar[data-main-type-bg='flying'],
 .dropdown-item[data-pokemon-type='flying'].selected .circle,
 .circle.flying.selected { background-color: var(--type-flying); }
+.progress-bar[data-main-type-bg='psychic'],
 .dropdown-item[data-pokemon-type='psychic'].selected .circle,
 .circle.psychic.selected { background-color: var(--type-psychic); }
+.progress-bar[data-main-type-bg='bug'],
 .dropdown-item[data-pokemon-type='bug'].selected .circle,
 .circle.bug.selected { background-color: var(--type-bug); }
+.progress-bar[data-main-type-bg='rock'],
 .dropdown-item[data-pokemon-type='rock'].selected .circle,
 .circle.rock.selected { background-color: var(--type-rock); }
+.progress-bar[data-main-type-bg='ghost'],
 .dropdown-item[data-pokemon-type='ghost'].selected .circle,
 .circle.ghost.selected { background-color: var(--type-ghost); }
+.progress-bar[data-main-type-bg='dragon'],
 .dropdown-item[data-pokemon-type='dragon'].selected .circle,
 .circle.dragon.selected { background-color: var(--type-dragon); }
+.progress-bar[data-main-type-bg='dark'],
 .dropdown-item[data-pokemon-type='dark'].selected .circle,
 .circle.dark.selected { background-color: var(--type-dark); }
+.progress-bar[data-main-type-bg='steel'],
 .dropdown-item[data-pokemon-type='steel'].selected .circle,
 .circle.steel.selected { background-color: var(--type-steel); }
+.progress-bar[data-main-type-bg='fairy'],
 .dropdown-item[data-pokemon-type='fairy'].selected .circle,
 .circle.fairy.selected { background-color: var(--type-fairy); }
 

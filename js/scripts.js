@@ -727,6 +727,8 @@ let PokemonDOMFactory = (function() {
     // Function to create modal content
     function createModalContent(pokemon) {
       const { name, types, imageUrl } = pokemon.data
+
+      const mainType = types[0].type.name
       
       // Content Parent Container
       const container = document.createElement('div')
@@ -770,25 +772,55 @@ let PokemonDOMFactory = (function() {
         function createStats() {
           const statsContainer = document.createElement('div')
           statsContainer.classList.add('stats-container', 'd-flex', 'flex-column')
+          const maxStats = {
+            hp: 255,
+            attack: 145,
+            defense: 250,
+            spAttk: 194,
+            spDef: 230,
+            speed: 180
+          }
           stats.forEach(s => {
             const { base_stat, stat } = s
-            console.log(base_stat)
-            console.log(stat)
+            const statWrapper = document.createElement('div')
+            statWrapper.classList.add('stat-wrapper')
+            const statTitle = document.createElement('span')
+            statTitle.classList.add('stat-title')
+            statTitle.innerText = stat.name.length <= 2 ? stat.name.toUpperCase()
+              : stat.name === 'special-attack' ? 'SP Attk'
+              : stat.name === 'special-defense' ? 'SP Def'
+              : StrHelpers.capitalize(stat.name)
+            const statBarContainer = document.createElement('div')
+            statBarContainer.classList.add('progress')
+
+            let statKey = stat.name === 'special-attack' ? 'spAttk'
+              : stat.name === 'special-defense' ? 'spDef'
+              : stat.name
+
+            // Calculate percentage
+            let percentage = (base_stat * 100) / maxStats[statKey]
+            const statBar = document.createElement('div')
+            statBar.classList.add('progress-bar')
+            statBar.setAttribute('role', 'progressbar')
+            statBar.setAttribute('aria-value-now', percentage)
+            statBar.setAttribute('aria-value-min', 0)
+            statBar.setAttribute('aria-value-max', 100)
+            statBar.setAttribute('data-main-type-bg', mainType)
+            statBar.style.width = `${percentage}%`
+            statBar.innerText = base_stat
+            statBarContainer.appendChild(statBar)
+            statWrapper.appendChild(statTitle)
+            statWrapper.appendChild(statBarContainer)
+            statsContainer.appendChild(statWrapper)
           })
+          return statsContainer
         }
-        createStats()
 
         // Return Section
         sectionContainer.appendChild(createImageFigure())
         sectionContainer.appendChild(createTypeBadges())
+        sectionContainer.appendChild(createStats())
         return sectionContainer
-
-        // const nameImageTypeStatsSection = DOMBuilder.container('section', 'name-img-types-stats')
-        // const nameBar = DOMBuilder.nameBar(name, types[0])
-        // const imgTypeStats = DOMBuilder.imageTypeStats(imageUrl, types, stats)
-        // nameImageTypeStatsSection.appendChild(nameBar)
-        // nameImageTypeStatsSection.appendChild(imgTypeStats)
-        // return nameImageTypeStatsSection
       }
 
       // Profile Details
