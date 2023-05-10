@@ -724,24 +724,52 @@ let PokemonDOMFactory = (function() {
   // IIFE for modal
   const ModalBuilder = (function() {
 
-    // DOM Element: Container of Modal
-    const modalContainer = document.querySelector('#modal-container')
-
     // Function to create modal content
     function createModalContent(pokemon) {
       const { name, types, imageUrl } = pokemon
       
       // Content Parent Container
-      const contentContainer = document.createElement('div')
+      const container = document.createElement('div')
+      container.classList.add('modal-body-wrapper')
 
       // Name, Image, Stats Container and Elements
       function createNameImageTypeStats(stats) {
-        const nameImageTypeStatsSection = DOMBuilder.container('section', 'name-img-types-stats')
-        const nameBar = DOMBuilder.nameBar(name, types[0])
-        const imgTypeStats = DOMBuilder.imageTypeStats(imageUrl, types, stats)
-        nameImageTypeStatsSection.appendChild(nameBar)
-        nameImageTypeStatsSection.appendChild(imgTypeStats)
-        return nameImageTypeStatsSection
+        const sectionContainer = document.createElement('div')
+        sectionContainer.classList.add('container')
+        sectionContainer.setAttribute('id', 'imageTypeStatsSection')
+
+        // Image Figure
+        const figureContainer = document.createElement('div')
+        figureContainer.classList.add('figure')
+        const imgElement = document.createElement('img')
+        imgElement.classList.add('figure-img', 'img-fluid', 'rounded')
+        imgElement.setAttribute('alt', `Image of ${StrHelpers.capitalize(name)}`)
+        imgElement.setAttribute('src', imageUrl)
+        figureContainer.appendChild(imgElement)
+
+        // Type(s) Pill Badges
+        const typesContainer = document.createElement('div')
+        typesContainer.classList.add('container')
+        types.forEach(typeObj => {
+          const { name } = typeObj.type
+          let pillElement = document.createElement('span')
+          pillElement.classList.add('badge', 'badge-pill')
+          pillElement.setAttribute('data-type', name)
+          pillElement.innerText = name.toUpperCase()
+          typesContainer.appendChild(pillElement)
+        })
+
+        // Return Section
+        sectionContainer.appendChild(figureContainer)
+        sectionContainer.appendChild(typesContainer)
+        return sectionContainer
+
+        // const nameImageTypeStatsSection = DOMBuilder.container('section', 'name-img-types-stats')
+        // const nameBar = DOMBuilder.nameBar(name, types[0])
+        // const imgTypeStats = DOMBuilder.imageTypeStats(imageUrl, types, stats)
+        // nameImageTypeStatsSection.appendChild(nameBar)
+        // nameImageTypeStatsSection.appendChild(imgTypeStats)
+        // return nameImageTypeStatsSection
       }
 
       // Profile Details
@@ -776,7 +804,7 @@ let PokemonDOMFactory = (function() {
       
       function createContentSections() {
         const sectionsArr = []
-
+        
         PokemonRepository.getDetails.card(pokemon).then(() => {
           const { stats, profile, evolutions, moves } = pokemon
           sectionsArr.push(createNameImageTypeStats(stats))
@@ -784,24 +812,18 @@ let PokemonDOMFactory = (function() {
           sectionsArr.push(createEvolutions(evolutions))
           sectionsArr.push(createMoves(moves))
         }).finally(() => {
-          sectionsArr.forEach(section => contentContainer.appendChild(section))
+          sectionsArr.forEach(section => container.appendChild(section))
         })
         
       }
 
       createContentSections()
-
-      return contentContainer
+      return container
     }
 
     // Function to show modal
     function showModal(pokemon) {
-      const container = document.createElement('div')
-      container.classList.add('modal-body-wrapper')
-
-      let modalContent = createModalContent(pokemon)
-      container.appendChild(modalContent)
-      return container
+      return createModalContent(pokemon)
     }
 
     return {
@@ -838,43 +860,6 @@ let PokemonDOMFactory = (function() {
   // Create Element: Pokemon Card Item
   function createPokemonCard(pokemon) {
     const card = DOMBuilder.pokemonCard(pokemon)
-    
-    // $(card).ready(function() {
-    //   let data 
-    //   $(card).on('click', function() {
-    //     data = pokemon
-    //     $('#myModal').modal('show')
-    //   })
-
-    //   $('#myModal').on('show.bs.modal', function() {
-    //     console.log(pokemon)
-    //   })
-    // })
-    
-    // card.addEventListener('click', function(e) {
-    //   $('#myModal').modal('show')
-    //   $('#myModal').on('show.bs.modal', function() {
-    //     $('#myModal').find('.modal-content').text('Pokemon data here')
-    //   })
-    // })
-
-    // $(card).click(function() {
-    //   $('#myModal').modal()
-    //   $('#myModal').on('show.bs.modal', function(e) {
-    //     let modal = $(this)
-    //     console.log(modal)
-    //     modal.find('.modal-title').text('Pokemon name here')
-
-    //   })
-    // })
-    
-    // card.addEventListener('click', function() {
-    //   ModalBuilder.show(pokemon)
-    // })
-    
-    // card.addEventListener('click', function() {
-    //   ModalBuilder.show(pokemon)
-    // })
     row.appendChild(card)
   }
 

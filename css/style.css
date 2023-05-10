@@ -97,24 +97,24 @@ p {
   display: inline-block;
   line-height: 1;
 }
-/* .normal { background-color: var(--type-normal); }
-.fire { background-color: var(--type-fire); }
-.water { background-color: var(--type-water); }
-.electric { background-color: var(--type-electric); }
-.grass { background-color: var(--type-grass); }
-.ice { background-color: var(--type-ice); }
-.fighting { background-color: var(--type-normal); }
-.poison { background-color: var(--type-poison); }
-.ground { background-color: var(--type-ground); }
-.flying { background-color: var(--type-flying); }
-.psychic { background-color: var(--type-psychic); }
-.bug { background-color: var(--type-bug); }
-.rock { background-color: var(--type-rock); }
-.ghost { background-color: var(--type-ghost); }
-.dragon { background-color: var(--type-dragon); }
-.dark { background-color: var(--type-dark); }
-.steel { background-color: var(--type-steel); }
-.fairy { background-color: var(--type-fairy); } */
+span[data-type='normal'] { background-color: var(--type-normal); }
+span[data-type='fire'] { background-color: var(--type-fire); }
+span[data-type='water'] { background-color: var(--type-water); }
+span[data-type='electric'] { background-color: var(--type-electric); }
+span[data-type='grass'] { background-color: var(--type-grass); }
+span[data-type='ice'] { background-color: var(--type-ice); }
+span[data-type='fighting'] { background-color: var(--type-normal); }
+span[data-type='poison'] { background-color: var(--type-poison); }
+span[data-type='ground'] { background-color: var(--type-ground); }
+span[data-type='flying'] { background-color: var(--type-flying); }
+span[data-type='psychic'] { background-color: var(--type-psychic); }
+span[data-type='bug'] { background-color: var(--type-bug); }
+span[data-type='rock'] { background-color: var(--type-rock); }
+span[data-type='ghost'] { background-color: var(--type-ghost); }
+span[data-type='dragon'] { background-color: var(--type-dragon); }
+span[data-type='dark'] { background-color: var(--type-dark); }
+span[data-type='steel'] { background-color: var(--type-steel); }
+span[data-type='fairy'] { background-color: var(--type-fairy); }
 
 .white-font { color: #FFFFFF; }
 .bold { font-weight: 700; }
