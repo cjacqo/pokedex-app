@@ -579,11 +579,11 @@ let PokemonDOMFactory = (function() {
 
     // Pokemon Card
     function createPokemonCard(pokemon) {
-      const { name, imageUrl, types } = pokemon
+      const { name, imageUrl, types } = pokemon.data
       const cardContainer = document.createElement('div')
       cardContainer.classList.add('border-dark', 'pokemon-card', 'text-white', 'bg-dark')
       cardContainer.setAttribute('data-pokemon', name)
-      cardContainer.setAttribute('data-pokemon-id', pokemon.id)
+      cardContainer.setAttribute('data-pokemon-id', pokemon.data.id)
       cardContainer.setAttribute('data-toggle', 'modal')
       cardContainer.setAttribute('data-target', '#myModal')
 
@@ -726,7 +726,7 @@ let PokemonDOMFactory = (function() {
 
     // Function to create modal content
     function createModalContent(pokemon) {
-      const { name, types, imageUrl } = pokemon
+      const { name, types, imageUrl } = pokemon.data
       
       // Content Parent Container
       const container = document.createElement('div')
@@ -804,16 +804,24 @@ let PokemonDOMFactory = (function() {
       
       function createContentSections() {
         const sectionsArr = []
+        const { stats, profile, evolutions, moves } = pokemon
+        sectionsArr.push(createNameImageTypeStats(stats))
+        sectionsArr.push(createProfileDetails(profile))
+        sectionsArr.push(createEvolutions(evolutions))
+        sectionsArr.push(createMoves(moves))
+        sectionsArr.forEach(section => container.appendChild(section))
         
-        PokemonRepository.getDetails.card(pokemon).then(() => {
-          const { stats, profile, evolutions, moves } = pokemon
-          sectionsArr.push(createNameImageTypeStats(stats))
-          sectionsArr.push(createProfileDetails(profile))
-          sectionsArr.push(createEvolutions(evolutions))
-          sectionsArr.push(createMoves(moves))
-        }).finally(() => {
-          sectionsArr.forEach(section => container.appendChild(section))
-        })
+        
+        // const { stats, profile, evolutions, moves } = pokemon
+        // PokemonRepository.getDetails.card(pokemon).then(() => {
+        //   const { stats, profile, evolutions, moves } = pokemon
+        //   sectionsArr.push(createNameImageTypeStats(stats))
+        //   sectionsArr.push(createProfileDetails(profile))
+        //   sectionsArr.push(createEvolutions(evolutions))
+        //   sectionsArr.push(createMoves(moves))
+        // }).finally(() => {
+        //   sectionsArr.forEach(section => container.appendChild(section))
+        // })
         
       }
 
@@ -852,9 +860,13 @@ let PokemonDOMFactory = (function() {
   $('#myModal').on('show.bs.modal', function(e) {
     let pokemonCard = $(e.relatedTarget)[0]
     // Get pokemon from repository
-    let data = PokemonRepository.getPokemon(pokemonCard.getAttribute('data-pokemon-id'))
-    $('#myModal').find('.modal-title').text(StrHelpers.capitalize(data.name))
-    $('#myModal').find('.modal-body').html(ModalBuilder.show(data))
+    let pokemon = PokemonRepository.getPokemon(pokemonCard.getAttribute('data-pokemon-id'))
+    PokemonRepository.getDetails(pokemon).then(() => {
+      $('#myModal').find('.modal-title').text(StrHelpers.capitalize(pokemon.data.name))
+      console.log(pokemon)
+      $('#myModal').find('.modal-body').html(ModalBuilder.show(pokemon))
+    }).catch(e => console.error(e))
+    
   })
   
   // Create Element: Pokemon Card Item
@@ -875,96 +887,174 @@ let PokemonDOMFactory = (function() {
 let PokemonRepository = (function() {
   // Empty array of pokemon
   const pokemonList = []
+  const pokemonMap = new Map()
   // API URL
   const apiUrlBuilder = (endpoint, idName) => `https://pokeapi.co/api/v2/${endpoint}/${idName}`
   const apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150'
-  
-  const loadPokemonPromise = new Promise((resolve, reject) => {
-    fetch(apiUrl).then(res => res.json().then(res => {
-      return res.results.map(p => {
-        return {
-          name: p.name,
-          detailsUrl: p.url
-        }
-      })
-    })).then(res => {
-      return res.map(p => {
-        let pokemon = fetch(p.detailsUrl).then(res => res.json().then(res => {
-          p.id = res.id
-          p.imageUrl = res.sprites.front_default
-          p.types = res.types
-          return p
-        }))
-        return pokemon
-      })
-    }).then(res => {
-      return Promise.all(res).then(v => resolve(v))
-    })
-    
-  })
 
-  async function loadPokemon() {
-    loadPokemonPromise.then(data => {
-      data.forEach(pokemon => {
-        pokemonList.push(pokemon)
-        PokemonDOMFactory.createPokemon(pokemon)
-      })
+  const fetchPokemon = function() {
+    return new Promise((resolve, reject) => {
+      fetch(apiUrl)
+        .then(res => res.json())
+        .then(data => {
+          return data.results.map(p => {
+            return {
+              name: p.name,
+              detailsUrl: p.url
+            }
+          })
+        })
+        .then(res => {
+          return res.map(p => {
+            let pokemon = fetch(p.detailsUrl)
+                            .then(res => res.json())
+                            .then(res => {
+                              p.id = res.id
+                              p.imageUrl = res.sprites.front_default
+                              p.types = res.types
+                              return p
+                            })
+            return pokemon
+          })
+          
+        })
+        .then(res => Promise.all(res).then(pokemon => {
+          resolve(makePokemonObj(pokemon))
+        }))
+        .catch(e => reject(e))
     })
   }
+
+  const makePokemonObj = function(data) {
+    function PokemonObj(name, detailsUrl, id, imageUrl, types) {
+      this.data = {
+        get name() { return name },
+        get detailsUrl() { return detailsUrl },
+        get id() { return id },
+        get imageUrl() { return imageUrl },
+        get types() { return types }
+      }
+    }
+
+    Object.defineProperties(PokemonObj.prototype, {
+      name: {
+        get: function() { return this._name }
+      },
+      detailsUrl: {
+        get: function() { return this._detailsUrl }
+      }
+    })
+
+    data.forEach(item => {
+      const { name, detailsUrl, id, imageUrl, types } = item
+      let pokemon = new PokemonObj(name, detailsUrl, id, imageUrl, types)
+      pokemonMap.set(pokemon.data.id, pokemon)
+      PokemonDOMFactory.createPokemon(pokemon)
+    })
+  }
+
+  const fetchRestOfPokemonDetails = async function(pokemon) {
+    try {
+      pokemon.stats = await fetchPokemonStats(pokemon)
+      pokemon.profile = await fetchPokemonProfile(pokemon)
+      pokemon.evolutions = await fetchPokemonEvolutions(pokemon)
+      pokemon.moves = await fetchPokemonMoves(pokemon)
+    } catch(e) {
+      console.error(e)
+    }
+  }
+  const fetchPokemonStats = async function(pokemon) {
+    let detailsUrl = pokemon.data.detailsUrl
+    let promise = new Promise((resolve, reject) => {
+      fetch(detailsUrl)
+        .then(res => res.json())
+        .then(res => resolve(res))
+        .catch(e => reject(e))
+    })
+    let result = await promise
+    return result
+  }
+  const fetchPokemonProfile = async function(pokemon) {
+    let speciesUrl = apiUrlBuilder('pokemon-species', pokemon.data.id)
+    let promise = new Promise((resolve, reject) => {
+      fetch(speciesUrl)
+        .then(res => res.json())
+        .then(res => {
+          const profile = {
+            captureRate: res.capture_rate,
+            eggGroups: res.egg_groups,
+            genderRate: res.gender_rate,
+            hatchSteps: res.hatch_counter * 255,
+            baseHappiness: res.base_happiness
+          }
+          return fetch(pokemon.data.detailsUrl)
+                  .then(res => res.json())
+                  .then(res => {
+                    profile.abilities = res.abilities
+                    profile.height = res.height
+                    profile.weight = res.weight
+                    return profile
+                  })
+        })
+        .then(res => resolve(res))
+        .catch(e => reject(e))
+    })
+    let result = await promise
+    return result
+  }
+  const fetchPokemonEvolutions = async function(pokemon) {
+    let speciesUrl = apiUrlBuilder('pokemon-species', pokemon.data.id)
+    let promise = new Promise((resolve, reject) => {
+      fetch(speciesUrl)
+        .then(res => res.json())
+        .then(res => {
+          return fetch(res.evolution_chain.url)
+                  .then(res => res.json())
+                  .then(res => {
+                    return parseEvolutions(res.chain)
+                  })
+        })
+        .then(res => resolve(res))
+        .catch(e => reject(e))
+    })
+    let result = await promise
+    return result
+  }
+  const fetchPokemonMoves = async function(pokemon) {
+    let movesUrl = apiUrlBuilder('pokemon', pokemon.data.id)
+    let promise = new Promise((resolve, reject) => {
+      fetch(movesUrl)
+        .then(res => res.json())
+        .then(res => {
+          return res.moves.map(m => {
+            const { move, version_group_details } = m
+            const { name, url } = move
+            return fetch(url)
+                    .then(res => res.json())
+                    .then(res => {
+                      const { accuracy, power, pp, type, effect_entries } = res
+                      return new Move(name, version_group_details, accuracy, power, pp, type, effect_entries)
+                    })
+                    .catch(e => console.error(e))
+          })
+        })
+        .then(res => {
+          Promise.all(res).then(values => {
+            return resolve(makeMovesLibrary(values))
+          })
+        })
+        .catch(e => reject(e))
+    })
+    let result = await promise
+    return result
+  }  
 
   // Function to get the id of the species at the end of the url: found at https://stackoverflow.com/questions/39160539/regex-pattern-to-get-number-between-forward-slashes-at-the-end-of-a-url
   function getId(s) {
     let m = s.match(/\/(\d+)\//)
     return m[1]
   }
-
-  // Function constructor to create a evolution object
-  function Evolution(details, species, evolvesTo) {
-    this.details = details.length === 0 ? false : {
-      get minLevel() { return details[0].min_level }
-    }
-    this.species = {
-      get name() { return species.name },
-      get url() { return species.url },
-      get imageUrl() { return `https:///raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${getId(this.url)}.png` }
-    },
-    this.evolvesTo = evolvesTo.length === 0 ? false : {
-      get evolution() { return evolvesTo[0] }
-    }
-  }
-  // Object literal for a moves library
-  const MovesObj = {
-    pokemon: '',
-    _moves: {
-      natural: [],
-      machine: [],
-      tutor: [],
-      egg: []
-    },
-    set move(move) {
-      const moveGroup = move.details.group
-      this._moves[moveGroup].push(move)
-      return this
-    },
-    get moves() {
-      return {
-        natural: this._moves.natural,
-        machine: this._moves.machine,
-        tutor: this._moves.tutor,
-        egg: this._moves.egg
-      }
-    },
-    sortNatural: function() {
-      return this.moves.natural.sort((a, b) => a.details.level > b.details.level)
-    },
-    sortAlphabetical: function() {
-      return {
-        machine: this.moves.machine.sort((a, b) => a.details.name > b.details.name),
-        tutor: this.moves.tutor.sort((a, b) => a.details.name > b.details.name),
-        egg: this.moves.egg.sort((a, b) => a.details.name > b.details.name)
-      }
-    }
-  }
+  
   // Function constructor for a move
   function Move(name, groupDetails, accuracy, power, pp, type, effect) {
     const groupName = groupDetails[0].move_learn_method.name
@@ -980,6 +1070,54 @@ let PokemonRepository = (function() {
       get pp() { return pp !== null ? pp : 'N/A' },
       get type() { return type.name },
       get effect() { return effect.length > 0 ? effect[0].effect : 'N/A' }
+    }
+  }
+
+  function MovesLibrary(moveArrs) {
+    this.data = {
+      get natural() { return moveArrs.natural },
+      get machine() { return moveArrs.machine },
+      get tutor() { return moveArrs.tutor },
+      get egg() { return moveArrs.egg }
+    }
+    this.sortNatural = function() {
+      return this.data.natural.sort((a, b) => a.details.level > b.details.level)
+    }
+    this.sortAlphabetical = function() {
+      return {
+        machine: this.data.machine.sort((a, b) => a.details.name > b.details.name),
+        tutor: this.data.tutor.sort((a, b) => a.details.name > b.details.name),
+        egg: this.data.egg.sort((a, b) => a.details.name > b.details.name)
+      }
+    }
+  }
+
+  function makeMovesLibrary(moves) {
+    const moveTypes = {
+      natural: [],
+      machine: [],
+      tutor: [],
+      egg: []
+    }
+    moves.forEach(move => {
+      const moveGroup = move.details.group
+      if (moveTypes[moveGroup]) moveTypes[moveGroup].push(move)
+    })
+    return new MovesLibrary(moveTypes)
+  }
+
+  // Function constructor to create a evolution object
+  function Evolution(details, species, evolvesTo) {
+    this.details = details.length === 0 ? false : {
+      get minLevel() { return details[0].min_level }
+    }
+    this.species = {
+      get name() { return species.name },
+      get url() { return species.url },
+      get imageUrl() { return `https:///raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/${getId(this.url)}.png` }
+    },
+    this.evolvesTo = evolvesTo.length === 0 ? false : {
+      get evolution() { return evolvesTo[0] }
     }
   }
 
@@ -1000,71 +1138,6 @@ let PokemonRepository = (function() {
     response.push(evolution)
     recurseEvolutionDetails(evolution, response)
     return response
-  }
-
-  function fetchData(url) {
-    return new Promise((resolve, reject) => {
-      fetch(url).then(res => resolve(res))
-    })
-  }
-
-  function retrieveMoves(data) {
-    return data.moves
-  }
-
-  function parseMoves(moves) {
-    return Promise.all(moves.map(_move => {
-      const { move, version_group_details } = _move
-      const { name, url } = move
-      return fetch(url).then(res => res.json()).then(res => {
-        const { accuracy, power, pp, type, effect_entries } = res
-        return new Move(name, version_group_details, accuracy, power, pp, type, effect_entries)
-      })
-    })).catch(e => console.error(e))
-  }
-
-  function getMovesLibrary(moves) {
-    const movesLibrary = Object.assign(Object.create(MovesObj))
-    moves.forEach(move => {
-      movesLibrary.move = move
-    })
-    return movesLibrary
-  }
-
-  async function loadCard(pokemon) {
-    let detailsUrl = pokemon.detailsUrl
-    let speciesUrl = apiUrlBuilder('pokemon-species', pokemon.id)
-    let movesUrl = apiUrlBuilder('pokemon', pokemon.id)
-
-    pokemon.stats = await fetch(detailsUrl).then(res => res.json().then(res => { return res.stats }))
-    
-    pokemon.profile = await fetch(speciesUrl).then(res => res.json().then(res => {
-      const profile = {
-        captureRate: res.capture_rate,
-        eggGroups: res.egg_groups,
-        genderRate: res.gender_rate,
-        hatchSteps: res.hatch_counter * 255,
-        baseHappiness: res.base_happiness
-      }
-      return fetch(detailsUrl).then(res => res.json().then(res => {
-        profile.abilities = res.abilities
-        profile.height = res.height
-        profile.weight = res.weight
-        return profile
-      }))
-    }))
-
-    pokemon.evolutions = await fetch(speciesUrl).then(res => res.json().then(res => {
-      return fetch(res.evolution_chain.url).then(res => res.json().then(res => {
-        return parseEvolutions(res.chain)
-      }))
-    }))
-
-    pokemon.moves = await fetchData(movesUrl)
-                            .then(res => res.json())
-                            .then(retrieveMoves)
-                            .then(parseMoves)
-                            .then(getMovesLibrary)
   }
 
   function filterPokemon(displayAll) {
@@ -1115,8 +1188,8 @@ let PokemonRepository = (function() {
 
       const selectedTypes = isSelected.map(selection => selection.innerText.toLowerCase())
 
-      pokemonList.forEach(pokemon => {
-        const { name, types } = pokemon
+      for (let [key, value] of pokemonMap) {
+        const { name, types } = value.data
         const pokemonCard = document.querySelector(`[data-pokemon = ${name}]`)
 
         const typesArr = types.map(typeObj => {
@@ -1125,11 +1198,9 @@ let PokemonRepository = (function() {
 
         if (containsType(selectedTypes, typesArr)) visibleCards.push(pokemonCard)
         else hiddenCards.push(pokemonCard)
-        
-      })
+      }
       displayCards(visibleCards, true)
       displayCards(hiddenCards)
-      
     }
   }
 
@@ -1196,19 +1267,17 @@ let PokemonRepository = (function() {
   }
 
   function getPokemonById(id) {
-    return pokemonList.find(pokemon => pokemon.id == id)
+    return pokemonMap.get(parseInt(id))
   }
 
   return {
-    init: loadPokemon,
-    getDetails: {
-      card: loadCard
-    },
+    init: fetchPokemon,
+    getDetails: fetchRestOfPokemonDetails,
     filter: filterPokemon,
     search: searchPokemon,
     sort: sortPokemon,
     getPokemon: getPokemonById,
-    get pokemon() { return pokemonList }
+    get pokemon() { return pokemonMap }
   }
 })()
 
