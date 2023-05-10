@@ -944,6 +944,65 @@ let PokemonDOMFactory = (function() {
         titleContainer.appendChild(titleElement)
         sectionContainer.appendChild(titleContainer)
 
+        // Evolution Card
+        function createEvolutionCard(currEvolution, nextEvolution, isLast) {
+          const rowContainer = document.createElement('div')
+          rowContainer.classList.add('row', 'pb-3', 'position-relative')
+
+          if (!isLast) rowContainer.classList.add('border-bottom')
+          
+          const currEvolutionColumnContainer = document.createElement('div')
+          const nextEvolutionColumnContainer = document.createElement('div')
+          currEvolutionColumnContainer.classList.add('col')
+          nextEvolutionColumnContainer.classList.add('col')
+          const currEvolutionCardContainer = document.createElement('div')
+          const nextEvolutionCardContainer = document.createElement('div')
+          currEvolutionCardContainer.classList.add('card', 'align-items-center', 'justify-content-center', 'border-0')
+          nextEvolutionCardContainer.classList.add('card', 'align-items-center', 'justify-content-center', 'border-0')
+          const currEvolutionImg = document.createElement('img')
+          const nextEvolutionImg = document.createElement('img')
+          currEvolutionImg.classList.add('card-img-top', 'small-card-img')
+          nextEvolutionImg.classList.add('card-img-top', 'small-card-img')
+
+          currEvolutionImg.setAttribute('src', currEvolution.species.imageUrl)
+          nextEvolutionImg.setAttribute('src', nextEvolution.species.imageUrl)
+
+          currEvolutionCardContainer.appendChild(currEvolutionImg)
+          nextEvolutionCardContainer.appendChild(nextEvolutionImg)
+
+          currEvolutionColumnContainer.appendChild(currEvolutionCardContainer)
+          nextEvolutionColumnContainer.appendChild(nextEvolutionCardContainer)
+          
+          rowContainer.appendChild(currEvolutionColumnContainer)
+          rowContainer.appendChild(nextEvolutionColumnContainer)
+
+          const fullWidthDivider = document.createElement('div')
+          fullWidthDivider.classList.add('w-100')
+          const textElement = document.createElement('p')
+          textElement.classList.add('small', 'text-center')
+          textElement.innerText = `${StrHelpers.capitalize(currEvolution.species.name)} evolves into ${StrHelpers.capitalize(nextEvolution.species.name)} at level ${nextEvolution.details.minLevel}`
+          fullWidthDivider.appendChild(textElement)
+
+          const arrowContainer = document.createElement('div')
+          arrowContainer.classList.add('position-absolute', 'evolution-arrow')
+          const arrowIcon = document.createElement('i')
+          arrowIcon.classList.add('fa-solid', 'fa-arrow-right')
+          arrowContainer.appendChild(arrowIcon)
+          
+          rowContainer.appendChild(arrowContainer)
+          rowContainer.appendChild(fullWidthDivider)
+          return rowContainer
+        }
+
+        console.log(evolutions)
+
+        evolutions.forEach((currEvolution, i) => {
+          if (i < evolutions.length - 1) {
+            let nextEvolution = evolutions[i + 1]
+            sectionContainer.appendChild(createEvolutionCard(currEvolution, nextEvolution, i + 1 === evolutions.length - 1))
+          }
+        })
+
         return sectionContainer
 
         // const evolutionsSection = DOMBuilder.container('section', 'evolutions-section')

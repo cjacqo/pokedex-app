@@ -471,8 +471,14 @@ span[data-type='fairy'] { background-color: var(--type-fairy); }
 
 /* EVOLUTIONS CONTENT */
 /* --- Images Wrapper */
-.evolution-imgs-wrapper {
-  gap: 2rem;
+.small-card-img {
+  width: 75%;
+}
+.evolution-arrow {
+  top: 40%;
+  left: 50%;
+  font-size: 2rem;
+  transform: translate(-50%, -50%);
 }
 
 /* MOVES CONTENT */
