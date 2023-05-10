@@ -584,6 +584,8 @@ let PokemonDOMFactory = (function() {
       cardContainer.classList.add('border-dark', 'pokemon-card', 'text-white', 'bg-dark')
       cardContainer.setAttribute('data-pokemon', name)
       cardContainer.setAttribute('data-pokemon-id', pokemon.id)
+      cardContainer.setAttribute('data-toggle', 'modal')
+      cardContainer.setAttribute('data-target', '#myModal')
 
       const imgContainer = document.createElement('div')
       imgContainer.classList.add('img-container')
@@ -794,31 +796,12 @@ let PokemonDOMFactory = (function() {
 
     // Function to show modal
     function showModal(pokemon) {
-      // Clear existing modal content
-      modalContainer.innerHTML = ''
+      const container = document.createElement('div')
+      container.classList.add('modal-body-wrapper')
 
-      // Create a modal element
-      let modal = document.createElement('div')
-      modal.classList.add('modal-box')
-
-      // Close button for modal
-      let closeBtnElement = document.createElement('button')
-      closeBtnElement.classList.add('modal-close')
-      closeBtnElement.innerText = 'Close'
-
-      closeBtnElement.addEventListener('click', (e) => {
-        e.preventDefault()
-        modalContainer.classList.remove('is-visible')
-      })
-
-      // Content element
       let modalContent = createModalContent(pokemon)
-
-      modal.appendChild(closeBtnElement)
-      modal.appendChild(modalContent)
-      modalContainer.appendChild(modal)
-
-      modalContainer.classList.add('is-visible')
+      container.appendChild(modalContent)
+      return container
     }
 
     return {
@@ -843,13 +826,55 @@ let PokemonDOMFactory = (function() {
     initSearchBar()
     initFilterAndSort()
   }
+
+  $('#myModal').on('show.bs.modal', function(e) {
+    let pokemonCard = $(e.relatedTarget)[0]
+    // Get pokemon from repository
+    let data = PokemonRepository.getPokemon(pokemonCard.getAttribute('data-pokemon-id'))
+    $('#myModal').find('.modal-title').text(StrHelpers.capitalize(data.name))
+    $('#myModal').find('.modal-body').html(ModalBuilder.show(data))
+  })
   
   // Create Element: Pokemon Card Item
   function createPokemonCard(pokemon) {
     const card = DOMBuilder.pokemonCard(pokemon)
-    card.addEventListener('click', function() {
-      ModalBuilder.show(pokemon)
-    })
+    
+    // $(card).ready(function() {
+    //   let data 
+    //   $(card).on('click', function() {
+    //     data = pokemon
+    //     $('#myModal').modal('show')
+    //   })
+
+    //   $('#myModal').on('show.bs.modal', function() {
+    //     console.log(pokemon)
+    //   })
+    // })
+    
+    // card.addEventListener('click', function(e) {
+    //   $('#myModal').modal('show')
+    //   $('#myModal').on('show.bs.modal', function() {
+    //     $('#myModal').find('.modal-content').text('Pokemon data here')
+    //   })
+    // })
+
+    // $(card).click(function() {
+    //   $('#myModal').modal()
+    //   $('#myModal').on('show.bs.modal', function(e) {
+    //     let modal = $(this)
+    //     console.log(modal)
+    //     modal.find('.modal-title').text('Pokemon name here')
+
+    //   })
+    // })
+    
+    // card.addEventListener('click', function() {
+    //   ModalBuilder.show(pokemon)
+    // })
+    
+    // card.addEventListener('click', function() {
+    //   ModalBuilder.show(pokemon)
+    // })
     row.appendChild(card)
   }
 
@@ -1185,6 +1210,10 @@ let PokemonRepository = (function() {
     populatePokemonCardsContainer(newSort)
   }
 
+  function getPokemonById(id) {
+    return pokemonList.find(pokemon => pokemon.id == id)
+  }
+
   return {
     init: loadPokemon,
     getDetails: {
@@ -1193,6 +1222,7 @@ let PokemonRepository = (function() {
     filter: filterPokemon,
     search: searchPokemon,
     sort: sortPokemon,
+    getPokemon: getPokemonById,
     get pokemon() { return pokemonList }
   }
 })()
