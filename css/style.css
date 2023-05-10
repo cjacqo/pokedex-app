@@ -465,26 +465,8 @@ span[data-type='fairy'] { background-color: var(--type-fairy); }
 
 /* PROFILE CONTENT */
 /* --- Profile Details Table */
-.profile-content-container {
-  grid-template-columns: 1fr;
-  grid-template-rows: auto;
-  gap: 0.3rem;
-}
-.table-row {
-  justify-content: space-evenly !important;
-}
-.row-item-container {
-  flex-basis: 20%;
-  flex-grow: 1;
-  flex-shrink: 1;
-  text-align: left;
-}
-.row-item-container p {
-  margin: 0;
-}
-.table-row-title {
-  text-align: right;
-  padding-right: 20px;
+.profile-data {
+  gap: 1rem;
 }
 
 /* EVOLUTIONS CONTENT */

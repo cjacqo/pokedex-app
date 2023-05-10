@@ -200,7 +200,7 @@ let PokemonDOMFactory = (function() {
       container.classList.add('sub-header-container')
       const subHeaderElement = document.createElement('h2')
       subHeaderElement.classList.add('sub-header')
-      if (mainType) subHeaderElement.classList.add(mainType.type.name, 'white-font')
+      if (mainType) subHeaderElement.classList.add(mainType)
       subHeaderElement.innerText = title
       container.appendChild(subHeaderElement)
       return container
@@ -825,18 +825,91 @@ let PokemonDOMFactory = (function() {
 
       // Profile Details
       function createProfileDetails(profile) {
-        const profileDetailsSection = DOMBuilder.container('section', 'profile-details-section')
-        const subHeader = DOMBuilder.subHeader('Profile', types[0])
-        const profileDetailsContent = DOMBuilder.profileContent(profile)
-        profileDetailsSection.appendChild(subHeader)
-        profileDetailsSection.appendChild(profileDetailsContent)
-        return profileDetailsSection
+        const sectionContainer = document.createElement('div')
+        sectionContainer.classList.add('d-flex', 'border-bottom', 'flex-wrap', 'pb-2')
+        sectionContainer.setAttribute('id', 'profileDetailsSection')
+
+        const titleContainer = document.createElement('div')
+        titleContainer.classList.add('flex-grow-1', 'mt-2')
+        const titleElement = document.createElement('h6')
+        titleElement.innerText = 'Profile'
+        titleContainer.appendChild(titleElement)
+        sectionContainer.appendChild(titleContainer)
+
+        const numOfKeys = Object.keys(profile).length
+
+        // Table
+        const container = document.createElement('div')
+        container.classList.add('container')
+        Object.entries(profile).forEach((entry, i) => {
+          const [key, value] = entry
+          let row = document.createElement('div')
+          row.classList.add('row', 'align-items-center', 'justify-content-around', 'pt-2', 'pb-2', 'pl-3')
+          if (i !== numOfKeys - 1) row.classList.add('border-bottom')
+          let colTitle = document.createElement('div')
+          let colValue = document.createElement('div')
+          colTitle.classList.add('col-5', 'p-0')
+          colValue.classList.add('col', 'p-0')
+          let title, text
+          if (key === 'height' || key === 'weight' || key === 'abilities') {
+            title = StrHelpers.capitalize(key)
+            text = key === 'height' ? StrHelpers.meterStr(value)
+                  : key === 'weight' ? StrHelpers.kgStr(value)
+                  : false
+            if (!text) {
+              const abilitiesArr = value.map(ability => {
+                return {
+                  name: ability.ability.name
+                }
+              })
+              text = StrHelpers.strsFromArr('name', abilitiesArr, ' - ')
+            }
+          } else if (key === 'captureRate') {
+            title = 'Capture Rate'
+            text = StrHelpers.percentageStr(value, 255)
+          } else if (key === 'genderRate') {
+            title = 'Gender Rate'
+            text = StrHelpers.genderRateStr(value)
+          } else if (key === 'eggGroups') {
+            title = 'Egg Groups'
+            text = StrHelpers.strsFromArr('name', value, ' - ')
+          } else if (key === 'hatchSteps' || key === 'baseHappiness') {
+            title = key === 'hatchSteps' ? 'Hatch Steps'
+                    : 'Base Happiness'
+            text = value
+          }
+          let titleElement = document.createElement('p')
+          let textElement = document.createElement('p')
+          titleElement.classList.add('small', 'bold')
+          textElement.classList.add('profile-data', 'small', 'd-flex', 'align-items-center')
+          titleElement.innerText = title
+          textElement.innerText = text
+
+          if (key === 'captureRate') {
+            let badge = document.createElement('span')
+            let badgeType = value < 45 ? { className: 'badge-danger', text: 'rare' }
+                          : value >= 45 && value < 105 ? { className: 'badge-warning', text: 'low' }
+                          : value >= 105 && value < 175 ? { className: 'badge-info', text: 'fair' }
+                          : { className: 'badge-success', text: 'good' }
+            badge.classList.add('badge', badgeType.className)
+            badge.innerText = StrHelpers.capitalize(badgeType.text)
+            textElement.appendChild(badge)
+          }
+          
+          colTitle.appendChild(titleElement)
+          colValue.appendChild(textElement)
+          row.appendChild(colTitle)
+          row.appendChild(colValue)
+          container.appendChild(row)
+        })
+        sectionContainer.appendChild(container)
+        return sectionContainer
       }
 
       // Damage Relations
       function createEvolutions(evolutions) {
         const evolutionsSection = DOMBuilder.container('section', 'evolutions-section')
-        const subHeader = DOMBuilder.subHeader('Evolutions', types[0])
+        const subHeader = DOMBuilder.subHeader('Evolutions', mainType)
         const evolutionsContent = DOMBuilder.evolutionsContent(evolutions)
         evolutionsSection.appendChild(subHeader)
         evolutionsSection.appendChild(evolutionsContent)
@@ -846,7 +919,7 @@ let PokemonDOMFactory = (function() {
       // Moves
       function createMoves(moves) {
         const movesSection = DOMBuilder.container('section', 'moves-section')
-        const subHeader = DOMBuilder.subHeader('Moves', types[0])
+        const subHeader = DOMBuilder.subHeader('Moves', mainType)
         const movesContent = DOMBuilder.movesContent(moves)
         movesSection.appendChild(subHeader)
         movesSection.appendChild(movesContent)
