@@ -523,6 +523,17 @@ span[data-type='fairy'] { background-color: var(--type-fairy); }
   text-align: left;
 }
 
+/* --- NOTHING FOUND MESSAGE --- */
+.nothing-found-container {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 200px;
+  height: 200px;
+  text-align: center;
+  transform: translate(-50%, -50%);
+}
+
 /* When the browser is at least 530px and above */
 @media screen and (min-width: 530px) {
   /* IMAGE TYPES STATS CONTAINER */

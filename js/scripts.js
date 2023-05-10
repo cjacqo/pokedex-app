@@ -417,7 +417,9 @@ let PokemonDOMFactory = (function() {
 
     // Empty Message
     function createEmptyMessage() {
+      if (document.querySelector('.nothing-found-container')) return
       const element = createTextContainer(['nothing-found-container'], 'h5', 'No pokemon')
+      console.log(element)
       document.body.appendChild(element)
     }
 
@@ -1359,6 +1361,14 @@ let PokemonRepository = (function() {
         if (containsType(selectedTypes, typesArr)) visibleCards.push(pokemonCard)
         else hiddenCards.push(pokemonCard)
       }
+
+      if (visibleCards.length === 0) {
+        PokemonDOMFactory.createEmptyMessage()
+      } else {
+        const emptyMessage = document.querySelector('.nothing-found-container')
+        if (emptyMessage) emptyMessage.remove()
+      }
+      
       displayCards(visibleCards, true)
       displayCards(hiddenCards)
     }
