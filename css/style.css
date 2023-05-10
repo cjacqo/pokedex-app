@@ -6,6 +6,7 @@
 
 body {
   overflow: hidden;
+  padding-top: 3.5rem;
 }
 
 .full-height {
@@ -138,20 +139,59 @@ p {
   margin-right: 0;
 }
 
+/* --- NAVBAR --- */
 .navbar-nav {
   /* align-items: center; */
   padding-top: 1rem;
   padding-bottom: 1rem;
   overflow-y: auto;
-  height: 100vh;
   gap: 5px;
 }
-form {
-  padding-top: 1rem;
+
+/* --- SEARCH BAR INPUT GROUP --- */
+#magnifyingGlass {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
 }
-.form-control[type='search'] {
+
+#filterTypesParent-Mobile {
+  display: none;
+}
+
+@media (max-width: 992px) {
+  #filterTypesContainer-Desktop {
+    display: none;
+  }
+  #filterTypesParent-Mobile {
+    display: block;
+  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* .form-control[type='search'] {
   width: 95%;
   margin: 0 auto;
+} */
+.form-control:focus {
+  border: 1px solid #6c757d !important;
+  box-shadow: inset 0 -1px 0px #6c757d,
+              inset -1px 0 0px #6c757d,
+              inset 1px 0 0px #6c757d,
+              inset 0 1px 0px #6c757d !important;
+  outline: none !important;
 }
 .dropdown-btn {
   background-color: transparent;
@@ -167,15 +207,34 @@ form {
   padding: 1rem 0;
   padding-left: 1rem;
 }
+.collapse-btns {
+  gap: 5px;
+}
+.btn:focus,
+.btn:active,
+.btn-primary:focus,
+.dropdown-btn:active,
+.dropdown-btn:focus {
+  box-shadow: none !important;
+  outline: none !important;
+}
+.btn[aria-expanded='true'] > i {
+  color: #FFF;
+}
 .dropdown-btn[aria-expanded='true'] {
   background-color: rgba(255, 255, 255, 0.25);
 }
 .dropdown-menu {
-  width: 100%;
-  transform: translate3d(0px, 0px, 0px) !important;
-  /* transform: translate3d(0px, 30px, 0px); */
-  background-color: transparent;
-  position: relative !important;
+  width: 100vw;
+  top: 90% !important;
+  border-radius: 0;
+  margin-left: -1px;
+  background-clip: unset;
+  /* transform: translate3d(0px, 0px, 0px) !important; */
+}
+.dropdown-menu.show {
+  display: flex !important;
+  overflow-x: auto;
 }
 .dropdown-item {
   display: flex;
@@ -183,58 +242,77 @@ form {
   align-items: center;
   cursor: pointer;
   border-radius: 5px;
+  gap: 25px;
   transition: all 0.25s ease-in;
 }
-.dropdown-item .circle {
+.circle {
   display: inline-block;
   width: 20px;
   height: 20px;
   border-radius: 50%;
   border: 3px solid;
 }
-.dropdown-item#all .circle {
+.dropdown-item[data-pokemon-type='all'] .circle {
   border-color: white;
 }
-.dropdown-item.selected#all .circle {
+.dropdown-item.selected[data-pokemon-type='all'] .circle {
   background-color: white;
 }
-.dropdown-item#normal .circle { border-color: var(--type-normal); }
-.dropdown-item#fire .circle { border-color: var(--type-fire); }
-.dropdown-item#water .circle { border-color: var(--type-water); }
-.dropdown-item#electric .circle { border-color: var(--type-electric); }
-.dropdown-item#grass .circle { border-color: var(--type-grass); }
-.dropdown-item#ice .circle { border-color: var(--type-ice); }
-.dropdown-item#fighting .circle { border-color: var(--type-fighting); }
-.dropdown-item#poison .circle { border-color: var(--type-poison); }
-.dropdown-item#ground .circle { border-color: var(--type-ground); }
-.dropdown-item#flying .circle { border-color: var(--type-flying); }
-.dropdown-item#psychic .circle { border-color: var(--type-psychic); }
-.dropdown-item#bug .circle { border-color: var(--type-bug); }
-.dropdown-item#rock .circle { border-color: var(--type-rock); }
-.dropdown-item#ghost .circle { border-color: var(--type-ghost); }
-.dropdown-item#dragon .circle { border-color: var(--type-dragon); }
-.dropdown-item#dark .circle { border-color: var(--type-dark); }
-.dropdown-item#steel .circle { border-color: var(--type-steel); }
-.dropdown-item#fairy .circle { border-color: var(--type-fairy); }
+.dropdown-item[data-pokemon-type='normal'] .circle { border-color: var(--type-normal); }
+.dropdown-item[data-pokemon-type='fire'] .circle { border-color: var(--type-fire); }
+.dropdown-item[data-pokemon-type='water'] .circle { border-color: var(--type-water); }
+.dropdown-item[data-pokemon-type='electric'] .circle { border-color: var(--type-electric); }
+.dropdown-item[data-pokemon-type='grass'] .circle { border-color: var(--type-grass); }
+.dropdown-item[data-pokemon-type='ice'] .circle { border-color: var(--type-ice); }
+.dropdown-item[data-pokemon-type='fighting'] .circle { border-color: var(--type-fighting); }
+.dropdown-item[data-pokemon-type='poison'] .circle { border-color: var(--type-poison); }
+.dropdown-item[data-pokemon-type='ground'] .circle { border-color: var(--type-ground); }
+.dropdown-item[data-pokemon-type='flying'] .circle { border-color: var(--type-flying); }
+.dropdown-item[data-pokemon-type='psychic'] .circle { border-color: var(--type-psychic); }
+.dropdown-item[data-pokemon-type='bug'] .circle { border-color: var(--type-bug); }
+.dropdown-item[data-pokemon-type='rock'] .circle { border-color: var(--type-rock); }
+.dropdown-item[data-pokemon-type='ghost'] .circle { border-color: var(--type-ghost); }
+.dropdown-item[data-pokemon-type='dragon'] .circle { border-color: var(--type-dragon); }
+.dropdown-item[data-pokemon-type='dark'] .circle { border-color: var(--type-dark); }
+.dropdown-item[data-pokemon-type='steel'] .circle { border-color: var(--type-steel); }
+.dropdown-item[data-pokemon-type='fairy'] .circle { border-color: var(--type-fairy); }
 
-.dropdown-item#normal.selected .circle { background-color: var(--type-normal); }
-.dropdown-item#fire.selected .circle { background-color: var(--type-fire); }
-.dropdown-item#water.selected .circle { background-color: var(--type-water); }
-.dropdown-item#electric.selected .circle { background-color: var(--type-electric); }
-.dropdown-item#grass.selected .circle { background-color: var(--type-grass); }
-.dropdown-item#ice.selected .circle { background-color: var(--type-ice); }
-.dropdown-item#fighting.selected .circle { background-color: var(--type-fighting); }
-.dropdown-item#poison.selected .circle { background-color: var(--type-poison); }
-.dropdown-item#ground.selected .circle { background-color: var(--type-ground); }
-.dropdown-item#flying.selected .circle { background-color: var(--type-flying); }
-.dropdown-item#psychic.selected .circle { background-color: var(--type-psychic); }
-.dropdown-item#bug.selected .circle { background-color: var(--type-bug); }
-.dropdown-item#rock.selected .circle { background-color: var(--type-rock); }
-.dropdown-item#ghost.selected .circle { background-color: var(--type-ghost); }
-.dropdown-item#dragon.selected .circle { background-color: var(--type-dragon); }
-.dropdown-item#dark.selected .circle { background-color: var(--type-dark); }
-.dropdown-item#steel.selected .circle { background-color: var(--type-steel); }
-.dropdown-item#fairy.selected .circle { background-color: var(--type-fairy); }
+.dropdown-item[data-pokemon-type='normal'].selected .circle,
+.circle.normal.selected { background-color: var(--type-normal); }
+.dropdown-item[data-pokemon-type='fire'].selected .circle,
+.circle.fire.selected { background-color: var(--type-fire); }
+.dropdown-item[data-pokemon-type='water'].selected .circle,
+.circle.water.selected { background-color: var(--type-water); }
+.dropdown-item[data-pokemon-type='electric'].selected .circle,
+.circle.electric.selected { background-color: var(--type-electric); }
+.dropdown-item[data-pokemon-type='grass'].selected .circle,
+.circle.grass.selected { background-color: var(--type-grass); }
+.dropdown-item[data-pokemon-type='ice'].selected .circle,
+.circle.ice.selected { background-color: var(--type-ice); }
+.dropdown-item[data-pokemon-type='fighting'].selected .circle,
+.circle.fighting.selected { background-color: var(--type-fighting); }
+.dropdown-item[data-pokemon-type='poison'].selected .circle,
+.circle.poison.selected { background-color: var(--type-poison); }
+.dropdown-item[data-pokemon-type='ground'].selected .circle,
+.circle.ground.selected { background-color: var(--type-ground); }
+.dropdown-item[data-pokemon-type='flying'].selected .circle,
+.circle.flying.selected { background-color: var(--type-flying); }
+.dropdown-item[data-pokemon-type='psychic'].selected .circle,
+.circle.psychic.selected { background-color: var(--type-psychic); }
+.dropdown-item[data-pokemon-type='bug'].selected .circle,
+.circle.bug.selected { background-color: var(--type-bug); }
+.dropdown-item[data-pokemon-type='rock'].selected .circle,
+.circle.rock.selected { background-color: var(--type-rock); }
+.dropdown-item[data-pokemon-type='ghost'].selected .circle,
+.circle.ghost.selected { background-color: var(--type-ghost); }
+.dropdown-item[data-pokemon-type='dragon'].selected .circle,
+.circle.dragon.selected { background-color: var(--type-dragon); }
+.dropdown-item[data-pokemon-type='dark'].selected .circle,
+.circle.dark.selected { background-color: var(--type-dark); }
+.dropdown-item[data-pokemon-type='steel'].selected .circle,
+.circle.steel.selected { background-color: var(--type-steel); }
+.dropdown-item[data-pokemon-type='fairy'].selected .circle,
+.circle.fairy.selected { background-color: var(--type-fairy); }
 
 .dropdown-item:hover,
 .dropdown-item.selected {
@@ -257,12 +335,14 @@ form {
   cursor: pointer;
   border-width: 1px;
   border-style: solid;
-  width: 200px;
+  width: 40%;
+  max-width: 250px;
+  /* width: 200px;
   height: 180px;
   min-width: 200px;
   max-width: 200px;
   min-height: 180px;
-  max-height: 180px;
+  max-height: 180px; */
   transition: all 0.25s ease-in;
 }
 .pokemon-card:hover {
@@ -273,6 +353,9 @@ form {
 .card-text {
   display: flex;
   justify-content: space-evenly;
+}
+.pokemon-card .card-body .card-title {
+  font-size: 14px;
 }
 
 /* Pokemon Buttons */

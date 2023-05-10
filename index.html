@@ -12,11 +12,45 @@
   <script src="js/fetch-polyfill.js" defer="defer"></script>
   <script src="js/scripts.js" defer="defer"></script>
 </head>
-<body class="container-fluid">
-  <div class="row full-height row-content">
-    <!-- <nav class="col-1 navbar navbar-expand-lg navbar-dark bg-dark sticky-top" id="navContainer"></nav> -->
-    <div class="navbar-dark bg-dark flex-column" id="navContainer"></div>
-    <div class="col" id="pokemonCardsContainer"></div>
+<body class="d-flex flex-column">
+  <!-- Navigation Bar -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+    <a href="#" class="navbar-brand flex-grow-1">Pokedex</a>
+
+    <!-- Navbar Toggler -->
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <!-- Collapse Container -->
+    <div class="collapse navbar-collapse flex-grow-0" id="navbarSupportedContent">
+      <ul class="navbar-nav mr-auto">
+        <li class="nav-item dropdown position-static" id="filterTypesParent-Mobile">
+          <a href="#" class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+            Filter By Type
+          </a>
+          <div id="filterTypesContainer-Mobile" class="dropdown-menu bg-dark" aria-labelledby="navbarDropdown"></div>
+        </li>
+      </ul>
+      <form class="form-inline my-2 my-lg-0">
+        <div class="input-group">
+          <div class="input-group-prepend">
+            <span class="input-group-text" id="magnifyingGlass"><i class="fa-solid fa-magnifying-glass"></i></span>
+          </div>
+          <input id="searchBar" type="text" class="form-control mr-sm-2" placeholder="Search" aria-label="Search" aria-describedby="magnifyingGlass">
+        </div>
+      </form>
+    </div>
+  </nav>
+  
+  <!-- Filter Drop Down List -->
+  <div class="container-fluid">
+    <div class="row">
+      <div class="dropdown bg-dark col-md-auto" id="filterTypesContainer-Desktop">
+      </div>
+
+      <div class="container-fluid col" id="pokemonCardsContainer"></div>
+    </div>
   </div>
 
   <!-- Modal Container -->

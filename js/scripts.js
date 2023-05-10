@@ -427,7 +427,7 @@ let PokemonDOMFactory = (function() {
           } else {
             target.classList.toggle('selected')
           }
-          PokemonRespository.filter(filterAll)
+          PokemonRepository.filter(filterAll)
           e.stopPropagation()
         }
         
@@ -483,7 +483,7 @@ let PokemonDOMFactory = (function() {
         searchBar.placeholder = 'Search'
         searchBar.ariaLabel = 'Search'
         searchBar.addEventListener('keyup', (e) => {
-          PokemonRespository.search(e)
+          PokemonRepository.search(e)
         })
         searchForm.appendChild(searchBar)
       }
@@ -506,7 +506,7 @@ let PokemonDOMFactory = (function() {
           } else {
             btn.innerText = 'Sort By'
           }
-          PokemonRespository.sort(target.id, target.classList.contains('selected'))
+          PokemonRepository.sort(target.id, target.classList.contains('selected'))
           e.stopPropagation()
         }
 
@@ -614,6 +614,90 @@ let PokemonDOMFactory = (function() {
       cardContainer.appendChild(cardBody)
       return cardContainer
     }
+
+    // Create Menu Item
+    function createMenuItem(text, classNames, createCircle, eventListener) {
+      let listItem = document.createElement('li')
+      listItem.classList.add('dropdown-item', 'text-light', 'd-flex', 'justify-content-between')
+      classNames.forEach(className => listItem.classList.add(className))
+      listItem.dataset.pokemonType = text
+      listItem.innerText = StrHelpers.capitalize(text)
+      if (createCircle) {
+        let listItemCircle = document.createElement('span')
+        listItemCircle.classList.add('circle', text)
+        if (text === 'all') listItem.classList.add('selected')
+        listItem.appendChild(listItemCircle)
+      }
+      return listItem
+    }
+    
+    // Type Filter Drop Down Menu
+    function createTypeFilterMenu() {
+      const desktopContainer = document.getElementById('filterTypesContainer-Desktop')
+      const mobileContainer = document.getElementById('filterTypesContainer-Mobile')
+
+      mobileContainer.addEventListener('click', (e) => {
+        e.preventDefault()
+        e.stopImmediatePropagation()
+      }, false)
+
+      let types = ['normal', 'fire', 'water', 'electric', 'grass', 'ice', 'fighting', 'poison', 'ground', 'flying', 'psychic', 'bug', 'rock', 'ghost', 'dragon', 'dark', 'steel', 'fairy']
+      types = types.sort((a, b) => a > b)
+
+      // Callback Function Event Listener
+      function handleFilterSelection(e, isAll) {
+        let target = e.target
+        let selectedType = target.dataset.pokemonType
+        if (!selectedType) {
+          target = target.parentNode
+          selectedType = target.dataset.pokemonType
+        }
+        let listItemTypes = Array.from(document.querySelectorAll('.type-filter'))
+
+        if (isAll) {
+          // Set selected class on both the target, and the clone
+          let allItems = Array.from(document.querySelectorAll(`[data-pokemon-type=${selectedType}]`))
+          if (!target.classList.contains('selected') && !allItems[0].classList.contains('selected')) {
+            allItems.forEach(item => item.classList.add('selected'))
+          }
+          // Remove selected class from all other elements
+          listItemTypes.forEach(listItem => {
+            if (listItem.dataset.pokemonType !== selectedType && listItem.classList.contains('selected')) listItem.classList.remove('selected')
+          })
+        } else {
+          // Toggle selected class on both the target, and the clone
+          const selectedFilters = Array.from(document.querySelectorAll(`[data-pokemon-type=${selectedType}]`))
+          selectedFilters.forEach(listItem => listItem.classList.toggle('selected'))
+        }
+        PokemonRepository.filter(isAll)
+      }
+
+      // All List Item
+      const allListItemD = createMenuItem('all', ['type-filter'], true)
+      const allListItemM = createMenuItem('all', ['type-filter'], true)
+      
+      desktopContainer.appendChild(allListItemD)
+      mobileContainer.appendChild(allListItemM)
+      types.forEach(type => {
+        const listItemD = createMenuItem(type, ['type-filter', 'type-selection'], true)
+        const listItemM = createMenuItem(type, ['type-filter', 'type-selection'], true)
+        desktopContainer.appendChild(listItemD)
+        mobileContainer.appendChild(listItemM)
+      })
+
+      // Add Event Listeners
+      Array.from(document.querySelectorAll('.type-filter')).forEach(function(i) {
+        i.addEventListener('click', function(e) {
+          e.preventDefault()
+          handleFilterSelection(e, i.dataset.pokemonType === 'all')
+        })
+      })
+    }
+    // Sort Filter Drop Down Menu
+    function createSortFilterMenu() {
+      const desktopContainer = document.getElementById('sortPokemonContainer-Desktop')
+      const mobileContainer = document.getElementById('sortPokemonContainer-Mobile')
+    }
     
     return {
       container: createContainer,
@@ -627,7 +711,11 @@ let PokemonDOMFactory = (function() {
       movesContent: createMovesContent,
       navigation: createNavigation,
       emptyMessage: createEmptyMessage,
-      pokemonCard: createPokemonCard
+      pokemonCard: createPokemonCard,
+      dropDownMenu: {
+        typeFilter: createTypeFilterMenu,
+        sortFilter: createSortFilterMenu
+      }
     }
   })()
 
@@ -687,7 +775,7 @@ let PokemonDOMFactory = (function() {
       function createContentSections() {
         const sectionsArr = []
 
-        PokemonRespository.getDetails.card(pokemon).then(() => {
+        PokemonRepository.getDetails.card(pokemon).then(() => {
           const { stats, profile, evolutions, moves } = pokemon
           sectionsArr.push(createNameImageTypeStats(stats))
           sectionsArr.push(createProfileDetails(profile))
@@ -737,6 +825,24 @@ let PokemonDOMFactory = (function() {
       show: showModal
     }
   })()
+
+  // Function to set listener and clear value of search bar
+  function initSearchBar() {
+    const searchBar = document.getElementById('searchBar')
+    searchBar.value = ''
+    searchBar.addEventListener('keyup', e => PokemonRepository.search(e))
+  }
+
+  // Function to create filter and sort drop down menus
+  function initFilterAndSort() {
+    DOMBuilder.dropDownMenu.typeFilter()
+  } 
+
+  // Init
+  function initDOMElements() {
+    initSearchBar()
+    initFilterAndSort()
+  }
   
   // Create Element: Pokemon Card Item
   function createPokemonCard(pokemon) {
@@ -748,6 +854,7 @@ let PokemonDOMFactory = (function() {
   }
 
   return {
+    init: initDOMElements,
     createPokemon: createPokemonCard,
     createNavigation: DOMBuilder.navigation,
     createEmptyMessage: DOMBuilder.emptyMessage
@@ -755,7 +862,7 @@ let PokemonDOMFactory = (function() {
 
 })()
 
-let PokemonRespository = (function() {
+let PokemonRepository = (function() {
   // Empty array of pokemon
   const pokemonList = []
   // API URL
@@ -953,14 +1060,14 @@ let PokemonRespository = (function() {
   function filterPokemon(displayAll) {
     let allCards = Array.from(document.querySelectorAll('[data-pokemon]'))
     let typeFilters = Array.from(document.querySelectorAll('.type-filter'))
+    const listItemsTypeAll = Array.from(document.querySelectorAll('[data-pokemon-type = all]'))
 
     function displayAllCards() {
       allCards.forEach(card => {
         if (card.classList.contains('hidden')) card.classList.remove('hidden')
         if (card.classList.contains('filtered')) card.classList.remove('filtered')
       })
-      let allFilter = document.getElementById('all')
-      allFilter.classList.add('selected')
+      listItemsTypeAll.forEach(listItem => listItem.classList.add('selected'))
     }
 
     function displayCards(arr, isVisible) {
@@ -985,8 +1092,10 @@ let PokemonRespository = (function() {
     if (displayAll) {
       return displayAllCards()
     } else {
-      const allListItem = document.getElementById('all')
-      if (allListItem.classList.contains('selected')) allListItem.classList.remove('selected')
+      listItemsTypeAll.forEach(listItem => {
+        if (listItem.classList.contains('selected')) listItem.classList.remove('selected')
+      })
+      // if (allListItem.classList.contains('selected')) allListItem.classList.remove('selected')
       let visibleCards = []
       let hiddenCards = []
 
@@ -1024,8 +1133,7 @@ let PokemonRespository = (function() {
       const selectedFilters = Array.from(document.querySelectorAll('.selected'))
       selectedFilters.forEach(filter => filter.classList.remove('selected'))
       // Set the selected filter to 'All'
-      const allFilter = document.getElementById('all')
-      allFilter.classList.add('selected')
+      Array.from(document.querySelectorAll('[data-pokemon-type=all]')).forEach(item => item.classList.add('selected'))
     }
     resetFilters()
     
@@ -1089,5 +1197,6 @@ let PokemonRespository = (function() {
   }
 })()
 
-PokemonRespository.init()
-PokemonDOMFactory.createNavigation()
+PokemonRepository.init()
+PokemonDOMFactory.init()
+// PokemonDOMFactory.createNavigation()
