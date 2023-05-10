@@ -994,8 +994,6 @@ let PokemonDOMFactory = (function() {
           return rowContainer
         }
 
-        console.log(evolutions)
-
         evolutions.forEach((currEvolution, i) => {
           if (i < evolutions.length - 1) {
             let nextEvolution = evolutions[i + 1]
@@ -1004,13 +1002,6 @@ let PokemonDOMFactory = (function() {
         })
 
         return sectionContainer
-
-        // const evolutionsSection = DOMBuilder.container('section', 'evolutions-section')
-        // const subHeader = DOMBuilder.subHeader('Evolutions', mainType)
-        // const evolutionsContent = DOMBuilder.evolutionsContent(evolutions)
-        // evolutionsSection.appendChild(subHeader)
-        // evolutionsSection.appendChild(evolutionsContent)
-        // return evolutionsSection
       }
 
       // Moves
@@ -1026,7 +1017,6 @@ let PokemonDOMFactory = (function() {
       function createContentSections() {
         const sectionsArr = []
         const { stats, profile, evolutions, moves } = pokemon
-        console.log(stats)
         sectionsArr.push(createNameImageTypeStats(stats))
         sectionsArr.push(createProfileDetails(profile))
         sectionsArr.push(createEvolutions(evolutions))
