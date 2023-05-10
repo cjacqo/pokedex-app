@@ -734,34 +734,53 @@ let PokemonDOMFactory = (function() {
 
       // Name, Image, Stats Container and Elements
       function createNameImageTypeStats(stats) {
+        // Parent Container
         const sectionContainer = document.createElement('div')
-        sectionContainer.classList.add('container')
+        sectionContainer.classList.add('d-flex', 'border-bottom', 'pb-2')
         sectionContainer.setAttribute('id', 'imageTypeStatsSection')
 
         // Image Figure
-        const figureContainer = document.createElement('div')
-        figureContainer.classList.add('figure')
-        const imgElement = document.createElement('img')
-        imgElement.classList.add('figure-img', 'img-fluid', 'rounded')
-        imgElement.setAttribute('alt', `Image of ${StrHelpers.capitalize(name)}`)
-        imgElement.setAttribute('src', imageUrl)
-        figureContainer.appendChild(imgElement)
+        function createImageFigure() {
+          const figureContainer = document.createElement('figure')
+          figureContainer.classList.add('figure')
+          const imgElement = document.createElement('img')
+          imgElement.classList.add('figure-img', 'img-fluid', 'rounded')
+          imgElement.setAttribute('alt', `Image of ${StrHelpers.capitalize(name)}`)
+          imgElement.setAttribute('src', imageUrl)
+          figureContainer.appendChild(imgElement)
+          return figureContainer
+        }
 
-        // Type(s) Pill Badges
-        const typesContainer = document.createElement('div')
-        typesContainer.classList.add('container')
-        types.forEach(typeObj => {
-          const { name } = typeObj.type
-          let pillElement = document.createElement('span')
-          pillElement.classList.add('badge', 'badge-pill')
-          pillElement.setAttribute('data-type', name)
-          pillElement.innerText = name.toUpperCase()
-          typesContainer.appendChild(pillElement)
-        })
+        // Type(s) Badges
+        function createTypeBadges() {
+          const typesContainer = document.createElement('div')
+          typesContainer.classList.add('container', 'types-stats-container', 'd-flex', 'justify-content-center')
+          types.forEach(typeObj => {
+            const { name } = typeObj.type
+            let badgeElement = document.createElement('span')
+            badgeElement.classList.add('badge', 'text-light')
+            badgeElement.setAttribute('data-type', name)
+            badgeElement.innerText = name.toUpperCase()
+            typesContainer.appendChild(badgeElement)
+          })
+          return typesContainer
+        }
+
+        // Stats
+        function createStats() {
+          const statsContainer = document.createElement('div')
+          statsContainer.classList.add('stats-container', 'd-flex', 'flex-column')
+          stats.forEach(s => {
+            const { base_stat, stat } = s
+            console.log(base_stat)
+            console.log(stat)
+          })
+        }
+        createStats()
 
         // Return Section
-        sectionContainer.appendChild(figureContainer)
-        sectionContainer.appendChild(typesContainer)
+        sectionContainer.appendChild(createImageFigure())
+        sectionContainer.appendChild(createTypeBadges())
         return sectionContainer
 
         // const nameImageTypeStatsSection = DOMBuilder.container('section', 'name-img-types-stats')
@@ -805,6 +824,7 @@ let PokemonDOMFactory = (function() {
       function createContentSections() {
         const sectionsArr = []
         const { stats, profile, evolutions, moves } = pokemon
+        console.log(stats)
         sectionsArr.push(createNameImageTypeStats(stats))
         sectionsArr.push(createProfileDetails(profile))
         sectionsArr.push(createEvolutions(evolutions))
@@ -954,7 +974,7 @@ let PokemonRepository = (function() {
     let promise = new Promise((resolve, reject) => {
       fetch(detailsUrl)
         .then(res => res.json())
-        .then(res => resolve(res))
+        .then(res => resolve(res.stats))
         .catch(e => reject(e))
     })
     let result = await promise

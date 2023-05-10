@@ -373,34 +373,7 @@ span[data-type='fairy'] { background-color: var(--type-fairy); }
 }
 
 /* Modal Styles */
-#modal-container {
-  display: none;
-}
 
-#modal-container.is-visible {
-  position: fixed;
-  padding: 20px;
-  box-sizing: border-box;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-
-  /* show it above other content */
-  z-index: 999;
-
-  /* to allow scrolling if the screen is not high enough */
-  overflow: auto;
-
-  /* used to center the modal */
-  display: grid;
-  text-align: center;
-}
-
-.modal-box {
-  background-color: #fff;
-}
 
 /* DEFAULT MIN-WIDTH AND MAX-WIDTH OF CONTENT CONTAINERS */
 .content-container {
@@ -410,29 +383,27 @@ span[data-type='fairy'] { background-color: var(--type-fairy); }
 }
 
 /* IMAGE TYPES STATS CONTAINER */
-.img-types-stats-container,
-.type-stats-container {
+#imageTypeStatsSection {
   flex-direction: column;
+  align-items: center;
   gap: 0.5rem;
 }
-
 /* --- Image Container & Image */
-.img-container {
-  width: 100px;
-  height: 100px;
+.figure {
+  width: 200px;
+  height: 200px;
 }
-.img-types-stats-container .img-container {
-  min-height: 160px;
+.figure-img {
+  width: 100%;
+  height: 100%;
 }
-.img-types-stats-container .img-container img {
-  min-width: 160px;
-  min-height: 160px;
-}
-
 /* --- Types Container */
 .types-stats-container {
   align-items: center;
   gap: 0.3rem;
+}
+.types-stats-container span {
+  padding: 1rem;
 }
 .types-container {
   text-align: left;
