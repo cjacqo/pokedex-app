@@ -1006,12 +1006,121 @@ let PokemonDOMFactory = (function() {
 
       // Moves
       function createMoves(moves) {
-        const movesSection = DOMBuilder.container('section', 'moves-section')
-        const subHeader = DOMBuilder.subHeader('Moves', mainType)
-        const movesContent = DOMBuilder.movesContent(moves)
-        movesSection.appendChild(subHeader)
-        movesSection.appendChild(movesContent)
-        return movesSection
+        const sectionContainer = document.createElement('div')
+        sectionContainer.classList.add('d-flex', 'border-bottom', 'flex-column')
+        sectionContainer.setAttribute('id', 'movesSection')
+
+        const titleContainer = document.createElement('div')
+        titleContainer.classList.add('flex-grow-1', 'mt-2')
+        const titleElement = document.createElement('h6')
+        titleElement.innerText = 'Moves'
+        titleContainer.appendChild(titleElement)
+        sectionContainer.appendChild(titleContainer)
+
+        const accordionContainer = document.createElement('div')
+        accordionContainer.setAttribute('id', 'accordion')
+        
+        function createAccordionCard(moves, groupName) {
+          const cardContainer = document.createElement('div')
+          cardContainer.classList.add('card')
+          
+          // Card Header & Collapse Button
+          const cardHeader = document.createElement('div')
+          cardHeader.classList.add('card-header')
+          cardHeader.setAttribute('id', `${groupName}Heading`)
+          const headerWrapper = document.createElement('h5')
+          headerWrapper.classList.add('mb-0')
+          const collapseButton = document.createElement('button')
+          collapseButton.classList.add('btn')
+          collapseButton.dataset.toggle = 'collapse'
+          collapseButton.dataset.target = `#${groupName}Collapse`
+          collapseButton.setAttribute('aria-expanded', 'true')
+          collapseButton.setAttribute('aria-controls', `${groupName}Collapse`)
+          collapseButton.innerText = StrHelpers.capitalize(groupName) + ' Moves'
+          headerWrapper.appendChild(collapseButton)
+          cardHeader.appendChild(headerWrapper)
+          cardContainer.appendChild(cardHeader)
+
+          // Collapse Content
+          const collapseContainer = document.createElement('div')
+          collapseContainer.classList.add('collapse')
+          collapseContainer.setAttribute('id', `${groupName}Collapse`)
+          collapseContainer.setAttribute('aria-labelledby', `${groupName}Heading`)
+          collapseContainer.dataset.parent = '#accordion'
+          const cardBody = document.createElement('div')
+          cardBody.classList.add('card-body', 'p-0')
+
+          // Loop through moves to create elements to then append to the cardBody
+          moves.forEach(move => {
+            const { name, level, accuracy, power, effect, pp, type } = move.details
+
+            const moveContainer = document.createElement('div')
+            moveContainer.classList.add('card', 'border-bottom', 'border-left-0', 'border-right-0', 'border-top-0')
+
+            const moveCardBody = document.createElement('div')
+            moveCardBody.classList.add('card-body', 'd-flex', 'justify-content-evenly', 'align-items-center')
+
+            if (level > 0) {
+              const levelElement = document.createElement('p')
+              levelElement.classList.add('small')
+              levelElement.innerText = level
+              moveCardBody.appendChild(levelElement)
+            }
+
+            const moveTitleElement = document.createElement('p')
+            moveTitleElement.classList.add('card-title', 'm-0', 'flex-grow-1')
+            moveTitleElement.innerText = StrHelpers.capitalize(name)
+
+            const moveTypeElement = document.createElement('p')
+            moveTypeElement.classList.add('card-text', 'small')
+            moveTypeElement.innerText = type.toUpperCase()
+
+            
+            const moveToggleButton = document.createElement('button')
+            moveToggleButton.classList.add('btn')
+            moveToggleButton.setAttribute('type', 'button')
+            moveToggleButton.dataset.toggle = 'collapse'
+            moveToggleButton.dataset.target = `#${name}Move`
+            moveToggleButton.setAttribute('aria-expanded', 'false')
+            moveToggleButton.setAttribute('aria-controls', `${name}Move`)
+            const caretDown = document.createElement('i')
+            caretDown.classList.add('fa-solid', 'fa-caret-down')
+            moveToggleButton.appendChild(caretDown)
+
+            moveCardBody.appendChild(moveTitleElement)
+            moveCardBody.appendChild(moveTypeElement)
+            moveCardBody.appendChild(moveToggleButton)
+            moveContainer.appendChild(moveCardBody)
+
+            const moveDetailsCollapseContainer = document.createElement('div')
+            moveDetailsCollapseContainer.classList.add('collapse')
+            moveDetailsCollapseContainer.setAttribute('id', `${name}Move`)
+            const moveDetailsCollapseCard = document.createElement('div')
+            moveDetailsCollapseCard.classList.add('card', 'card-body')
+            moveDetailsCollapseCard.innerText = 'Test'
+
+            moveDetailsCollapseContainer.appendChild(moveDetailsCollapseCard)
+            moveContainer.appendChild(moveDetailsCollapseContainer)
+            cardBody.appendChild(moveContainer)
+          })
+
+          collapseContainer.appendChild(cardBody)
+          cardContainer.appendChild(collapseContainer)
+          return cardContainer
+        }
+
+        accordionContainer.appendChild(createAccordionCard(moves.sortNatural(), 'natural'))
+        
+        sectionContainer.appendChild(accordionContainer)
+        
+        return sectionContainer
+        
+        // const movesSection = DOMBuilder.container('section', 'moves-section')
+        // const subHeader = DOMBuilder.subHeader('Moves', mainType)
+        // const movesContent = DOMBuilder.movesContent(moves)
+        // movesSection.appendChild(subHeader)
+        // movesSection.appendChild(movesContent)
+        // return movesSection
       }
       
       function createContentSections() {
