@@ -220,165 +220,6 @@ let PokemonDOMFactory = (function() {
       return container
     }
 
-    // Image, Type and Stats
-    function createImageTypeStats(url, types, stats) {
-      const container = document.createElement('div')
-      container.classList.add('content-container', 'img-types-stats-container', 'flex')
-
-      const imgElement = createImageElement(url)
-
-      const typeStatsContainer = document.createElement('div')
-      typeStatsContainer.classList.add('types-stats-container', 'flex', 'col')
-
-      const typesElement = createTypesElement(types)
-      const statsElement = createStatsElement(stats, types[0])
-
-      typeStatsContainer.appendChild(typesElement)
-      typeStatsContainer.appendChild(statsElement)
-
-      container.appendChild(imgElement)
-      container.appendChild(typeStatsContainer)
-
-      return container
-    }
-
-    // Profile Content Table
-    function createProfileContentTable(profile) {
-      const abilitiesArr = profile.abilities.map(ability => {
-        return {
-          name: ability.ability.name
-        }
-      })
-      const container = createContainer('content-container', 'profile-content-container', 'grid')
-      const heightRow = createTableRow('Height', StrHelpers.meterStr(profile.height), 'profile-content')
-      const weightRow = createTableRow('Weight', StrHelpers.kgStr(profile.weight), 'profile-content')
-      const captureRateRow = createTableRow('Catch Rate', StrHelpers.percentageStr(profile.captureRate, 255), 'profile-content')
-      const genderRateRow = createTableRow('Gender Rate', StrHelpers.genderRateStr(profile.genderRate), 'profile-content')
-      const eggGroupsRow = createTableRow('Egg Groups', StrHelpers.strsFromArr('name', profile.eggGroups, ' - '), 'profile-content')
-      const hatchStepsRow = createTableRow('Hatch Steps', profile.hatchSteps, 'profile-content')
-      const abilitiesRow = createTableRow('Abilities', StrHelpers.strsFromArr('name', abilitiesArr, ' - '), 'profile-content')
-      const happinessRow = createTableRow('Base Happiness', profile.baseHappiness, 'profile-content')
-      container.appendChild(heightRow)
-      container.appendChild(weightRow)
-      container.appendChild(captureRateRow)
-      container.appendChild(genderRateRow)
-      container.appendChild(eggGroupsRow)
-      container.appendChild(hatchStepsRow)
-      container.appendChild(abilitiesRow)
-      container.appendChild(happinessRow)
-      return container
-    }
-
-    // Pokemon Evolutions
-    function createEvolutionsContent(evolutions) {
-      const container = createContainer('content-container', 'evolutions-content-container')
-
-      // Function to create evolution container
-      function createEvolutionContainer(currEvolution, nextEvolution) {
-        const evolutionContainer = createContainer('evolution-container')
-        const imagesWrapper = createContainer('evolution-imgs-wrapper', 'flex', 'jc-c', 'ai-c')
-
-        const currEvolutionImage = createImageElement(currEvolution.species.imageUrl)
-        const arrowImage = createImageElement('./svg/arrow.svg')
-        const nextEvolutionImage = createImageElement(nextEvolution.species.imageUrl)
-        const evolutionDetail = createTextContainer([ 'evolution-details' ], 'p', `${StrHelpers.capitalize(currEvolution.species.name)} evolves into ${StrHelpers.capitalize(nextEvolution.species.name)} at level ${nextEvolution.details.minLevel}`)
-
-        imagesWrapper.appendChild(currEvolutionImage)
-        imagesWrapper.appendChild(arrowImage)
-        imagesWrapper.appendChild(nextEvolutionImage)
-        evolutionContainer.appendChild(imagesWrapper)
-        evolutionContainer.appendChild(evolutionDetail)
-        return evolutionContainer
-      }
-      
-      evolutions.forEach((currEvolution, i) => {
-        if (i < evolutions.length - 1) {
-          let nextEvolution = evolutions[i + 1]
-          container.appendChild(createEvolutionContainer(currEvolution, nextEvolution))
-        }
-      })
-      return container
-    }
-
-    // Pokemon Moves
-    function createMovesContent(moves) {
-
-      function createMovesGroup(moves, group) {
-        const container = createContainer('moves-group', `${group}-moves-group`)
-        const subHeader = createSubHeader(`${StrHelpers.capitalize(group)} Moves`)
-        const movesWrapper = createContainer('moves-wrapper')
-        moves.forEach(move => {
-          const { name, level, accuracy, power, effect, pp, type } = move.details
-          const moveContentContainer = createContainer('move-content-container')
-          const moveRow = createContainer('move-row', 'flex', 'jc-se')
-          const dropDownRow = createContainer('drop-down-row', 'flex', 'col', 'hidden')
-          if (level > 0) {
-            const levelElement = document.createElement('p')
-            levelElement.classList.add('move-detail', 'move-level-element')
-            levelElement.innerText = level
-            moveRow.appendChild(levelElement)
-          }
-          const titleElement = document.createElement('p')
-          titleElement.innerText = StrHelpers.capitalize(name)
-          titleElement.classList.add('move-detail', 'move-title-element')
-
-          const typeElement = document.createElement('p')
-          typeElement.classList.add(type,'move-detail', 'move-type-element', 'white-font')
-          typeElement.innerText = type.toUpperCase()
-
-          const buttonElement = document.createElement('button')
-          buttonElement.classList.add('btn-dropdown', 'move-button')
-          buttonElement.innerText = '>'
-
-          buttonElement.addEventListener('click', (e) => {
-            e.preventDefault()
-            dropDownRow.classList.toggle('hidden')
-          })
-
-          const moveStatsContainer = createContainer('move-stats-container', 'flex', 'jc-sb')
-          const powerTitle = document.createElement('p')
-          powerTitle.innerText = `Power: ${power ? power : 'N/A'}`
-          const accuracyTitle = document.createElement('p')
-          accuracyTitle.innerText = `Power: ${accuracy ? accuracy : 'N/A'}`
-          const ppTitle = document.createElement('p')
-          ppTitle.innerText = `Power: ${pp ? pp : 'N/A'}`
-          moveStatsContainer.appendChild(powerTitle)
-          moveStatsContainer.appendChild(accuracyTitle)
-          moveStatsContainer.appendChild(ppTitle)
-
-          const moveEffectContainer = createContainer('move-effect-container')
-          const moveEffectContent = document.createElement('p')
-          moveEffectContainer.innerText = effect
-          moveEffectContainer.appendChild(moveEffectContent)
-
-          dropDownRow.appendChild(moveStatsContainer)
-          dropDownRow.appendChild(moveEffectContainer)
-
-          moveRow.appendChild(titleElement)
-          moveRow.appendChild(typeElement)
-          moveRow.appendChild(buttonElement)
-          moveContentContainer.appendChild(moveRow)
-          moveContentContainer.appendChild(dropDownRow)
-          movesWrapper.appendChild(moveContentContainer)
-        })
-        container.appendChild(subHeader)
-        container.appendChild(movesWrapper)
-        return container
-      }
-      
-      const container = createContainer('content-container', 'moves-content-container')
-      const naturalMovesGroup = createMovesGroup(moves.sortNatural(), 'natural')
-      const machineMovesGroup = createMovesGroup(moves.sortAlphabetical().machine, 'machine')
-      const tutorMovesGroup = createMovesGroup(moves.sortAlphabetical().tutor, 'tutor')
-      const eggMovesGroup = createMovesGroup(moves.sortAlphabetical().egg, 'egg')
-
-      container.appendChild(naturalMovesGroup)
-      container.appendChild(machineMovesGroup)
-      container.appendChild(tutorMovesGroup)
-      container.appendChild(eggMovesGroup)
-      return container
-    }
-
     // Navigation
     function createNavigation() {
       const navbar = document.getElementById('navContainer')
@@ -1026,19 +867,19 @@ let PokemonDOMFactory = (function() {
           
           // Card Header & Collapse Button
           const cardHeader = document.createElement('div')
-          cardHeader.classList.add('card-header')
+          cardHeader.classList.add('card-header', 'bg-secondary', 'text-light')
           cardHeader.setAttribute('id', `${groupName}Heading`)
           const headerWrapper = document.createElement('h5')
           headerWrapper.classList.add('mb-0')
+          headerWrapper.innerText = StrHelpers.capitalize(groupName) + ' Moves'
           const collapseButton = document.createElement('button')
-          collapseButton.classList.add('btn')
+          collapseButton.classList.add('btn', 'w-100')
           collapseButton.dataset.toggle = 'collapse'
           collapseButton.dataset.target = `#${groupName}Collapse`
           collapseButton.setAttribute('aria-expanded', 'true')
           collapseButton.setAttribute('aria-controls', `${groupName}Collapse`)
-          collapseButton.innerText = StrHelpers.capitalize(groupName) + ' Moves'
-          headerWrapper.appendChild(collapseButton)
-          cardHeader.appendChild(headerWrapper)
+          collapseButton.appendChild(headerWrapper)
+          cardHeader.appendChild(collapseButton)
           cardContainer.appendChild(cardHeader)
 
           // Collapse Content
@@ -1096,8 +937,28 @@ let PokemonDOMFactory = (function() {
             moveDetailsCollapseContainer.classList.add('collapse')
             moveDetailsCollapseContainer.setAttribute('id', `${name}Move`)
             const moveDetailsCollapseCard = document.createElement('div')
-            moveDetailsCollapseCard.classList.add('card', 'card-body')
-            moveDetailsCollapseCard.innerText = 'Test'
+            moveDetailsCollapseCard.classList.add('card', 'card-body', 'bg-light', 'border-0', 'rounded-0')
+            
+            const moveStatsContainer = document.createElement('div')
+            moveStatsContainer.classList.add('move-stats-container')
+            const powerTitle = document.createElement('p')
+            powerTitle.innerText = `Power: ${power ? power : 'N/A'}`
+            const accuracyTitle = document.createElement('p')
+            accuracyTitle.innerText = `Power: ${accuracy ? accuracy : 'N/A'}`
+            const ppTitle = document.createElement('p')
+            ppTitle.innerText = `Power: ${pp ? pp : 'N/A'}`
+            moveStatsContainer.appendChild(powerTitle)
+            moveStatsContainer.appendChild(accuracyTitle)
+            moveStatsContainer.appendChild(ppTitle)
+
+            const moveEffectContainer = document.createElement('div')
+            moveEffectContainer.classList.add('move-effect-container')
+            const moveEffectContent = document.createElement('p')
+            moveEffectContainer.innerText = effect
+            moveEffectContainer.appendChild(moveEffectContent)
+
+            moveDetailsCollapseCard.appendChild(moveStatsContainer)
+            moveDetailsCollapseCard.appendChild(moveEffectContainer)
 
             moveDetailsCollapseContainer.appendChild(moveDetailsCollapseCard)
             moveContainer.appendChild(moveDetailsCollapseContainer)
@@ -1110,17 +971,13 @@ let PokemonDOMFactory = (function() {
         }
 
         accordionContainer.appendChild(createAccordionCard(moves.sortNatural(), 'natural'))
+        accordionContainer.appendChild(createAccordionCard(moves.sortAlphabetical().machine, 'machine'))
+        accordionContainer.appendChild(createAccordionCard(moves.sortAlphabetical().tutor, 'tutor'))
+        accordionContainer.appendChild(createAccordionCard(moves.sortAlphabetical().egg, 'egg'))
         
         sectionContainer.appendChild(accordionContainer)
         
         return sectionContainer
-        
-        // const movesSection = DOMBuilder.container('section', 'moves-section')
-        // const subHeader = DOMBuilder.subHeader('Moves', mainType)
-        // const movesContent = DOMBuilder.movesContent(moves)
-        // movesSection.appendChild(subHeader)
-        // movesSection.appendChild(movesContent)
-        // return movesSection
       }
       
       function createContentSections() {
