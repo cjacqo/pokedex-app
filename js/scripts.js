@@ -741,7 +741,7 @@ let PokemonDOMFactory = (function() {
       function createNameImageTypeStats(stats) {
         // Parent Container
         const sectionContainer = document.createElement('div')
-        sectionContainer.classList.add('d-flex', 'border-bottom', 'pb-2')
+        sectionContainer.classList.add('d-flex', 'border-bottom', 'pb-3')
         sectionContainer.setAttribute('id', 'imageTypeStatsSection')
 
         // Image Figure
@@ -788,7 +788,7 @@ let PokemonDOMFactory = (function() {
             const statWrapper = document.createElement('div')
             statWrapper.classList.add('stat-wrapper')
             const statTitle = document.createElement('span')
-            statTitle.classList.add('stat-title')
+            statTitle.classList.add('stat-title', 'small')
             statTitle.innerText = stat.name.length <= 2 ? stat.name.toUpperCase()
               : stat.name === 'special-attack' ? 'SP Attk'
               : stat.name === 'special-defense' ? 'SP Def'
