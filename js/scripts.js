@@ -810,19 +810,6 @@ let PokemonDOMFactory = (function() {
         sectionsArr.push(createEvolutions(evolutions))
         sectionsArr.push(createMoves(moves))
         sectionsArr.forEach(section => container.appendChild(section))
-        
-        
-        // const { stats, profile, evolutions, moves } = pokemon
-        // PokemonRepository.getDetails.card(pokemon).then(() => {
-        //   const { stats, profile, evolutions, moves } = pokemon
-        //   sectionsArr.push(createNameImageTypeStats(stats))
-        //   sectionsArr.push(createProfileDetails(profile))
-        //   sectionsArr.push(createEvolutions(evolutions))
-        //   sectionsArr.push(createMoves(moves))
-        // }).finally(() => {
-        //   sectionsArr.forEach(section => container.appendChild(section))
-        // })
-        
       }
 
       createContentSections()
@@ -886,7 +873,6 @@ let PokemonDOMFactory = (function() {
 
 let PokemonRepository = (function() {
   // Empty array of pokemon
-  const pokemonList = []
   const pokemonMap = new Map()
   // API URL
   const apiUrlBuilder = (endpoint, idName) => `https://pokeapi.co/api/v2/${endpoint}/${idName}`
