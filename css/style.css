@@ -616,3 +616,9 @@ nav {
     width: 100%;
   }
 }
+
+
+
+.filtered-img {
+  filter: brightness(0);
+}

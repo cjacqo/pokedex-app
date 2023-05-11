@@ -6,6 +6,7 @@ let PokemonDOMFactory = (function() {
   const row = document.createElement('div')
   row.classList.add('row', 'justify-content-center', 'scroll-y', 'larger-mobile')
   pokemonCardsContainer.appendChild(row)
+
   // IIFE for string helpers
   const StrHelpers = (function() {
     // Capitalize String Helper
@@ -920,11 +921,22 @@ let PokemonDOMFactory = (function() {
     row.appendChild(card)
   }
 
+  function loadPokemonCards() {
+    const row = document.createElement('div')
+    row.classList.add('row', 'justify-content-center', 'scroll-y', 'larger-mobile')
+    pokemonCardsContainer.appendChild(row)
+    for (let [key, value] of PokemonRepository.pokemon) {
+      const card = DOMBuilder.pokemonCard(value)
+      row.appendChild(card)
+    }
+  }
+
   return {
     init: initDOMElements,
     createPokemon: createPokemonCard,
     createNavigation: DOMBuilder.navigation,
-    createEmptyMessage: DOMBuilder.emptyMessage
+    createEmptyMessage: DOMBuilder.emptyMessage,
+    loadPokemonCards
   }
 
 })()
@@ -1335,3 +1347,204 @@ let PokemonRepository = (function() {
 
 PokemonRepository.init()
 PokemonDOMFactory.init()
+
+let GameControl = (function() {
+  // Variables to see if a game is currently happening, tracking total correct answers, and more
+  let isPlaying = false
+  let lives
+  let pokemonUsedIds = []
+  let pokemonMap = PokemonRepository.pokemon
+  let correctAnswers = 0
+  let wrongAnswers = 0
+  
+  // Start Game Listener & Functions
+  const startGameButton = document.getElementById('startGameButton')
+  startGameButton.addEventListener('click', function(e) {
+    e.preventDefault()
+    if (isPlaying) return
+    this.setAttribute('disabled', 'true')
+    clearPokemonList()
+    isPlaying = true
+    lives = 5
+    playGame()
+  })
+
+  const pokemonCardsContainer = document.getElementById('pokemonCardsContainer')
+
+  // Function to get random number
+  const getRandomNumber = () => {
+    // if array of pokemon used id length equals the number of pokemon, return and end game with a win
+    if (pokemonUsedIds.length > 150 - 1) return null
+
+    let output = null
+
+    // if the randomly generated number is in the pokemon used ids array, reroll
+    while (output === null || pokemonUsedIds.includes(output)) {
+      output = Math.floor(Math.random() * (150 - 1) + 1)
+    }
+
+    return output
+  }
+
+  function clearPokemonList() {
+    // Next, clear the pokemon cards container child element
+    pokemonCardsContainer.children[0].remove()
+
+    // Hide the filter by types containers
+    document.getElementById('filterTypesContainer-Desktop').style.display = 'none'
+    document.getElementById('filterTypesContainer-Mobile').style.display = 'none'
+  }
+  
+  // Function to set up the game and start it
+  function playGame() {
+    const pokemon = pokemonMap.get(getRandomNumber())
+    console.log(pokemon)
+    const { name, id, imageUrl } = pokemon.data
+    pokemonUsedIds.push(id)
+    pokemonCardsContainer.appendChild(createQuestionCard(imageUrl))
+    
+    document.getElementById('submitPokemonAnswer').onclick = function() {
+      let userAnswer = document.getElementById('nameThatPokemonInput').value
+
+      let img = document.getElementById('whoseThatPokemonImage')
+      img.classList.remove('filtered-img')
+
+      let feedbackStr
+
+      if (userAnswer.toLowerCase().trim() == name) {
+        console.log('CORRECT!')
+        feedbackStr = `Correct! The pokemon is ${name}`
+        correctAnswers++
+      } else {
+        console.log("INCORRECT")
+        lives--
+        wrongAnswers++
+        if (lives === 0) feedbackStr = `Game over! You answered a total of ${correctAnswers} right out of ${correctAnswers + wrongAnswers}. Better luck next time!`
+        else {
+          feedbackStr = `Incorrect! You answered ${userAnswer}, but the pokemon is ${name}.`
+          if (lives > 1) feedbackStr += `You have ${lives} lives left.`
+          else feedbackStr += `You only have ${lives} life left!`
+        }
+      }
+
+      createFeedBack(feedbackStr, lives !== 0)
+    }
+    
+  }
+
+  function resetGame() {
+    isPlaying = true
+    lives = 5
+    pokemonUsedIds = []
+    correctAnswers = 0
+    wrongAnswers = 0
+    playGame()
+  }
+  
+  function endGame() {
+    isPlaying = false
+    lives = 0
+    pokemonUsedIds = []
+    correctAnswers = 0
+    wrongAnswers = 0
+    startGameButton.removeAttribute('disabled')
+    document.getElementById('filterTypesContainer-Desktop').style.display = 'initial'
+    document.getElementById('filterTypesContainer-Mobile').style.display = 'initial'
+    PokemonDOMFactory.loadPokemonCards()
+  }
+
+  // Function to create a card element with passed pokemon
+  function createQuestionCard(imageUrl) {
+    const container = document.createElement('div')
+    container.classList.add('card', 'w-25', 'mx-auto')
+    container.setAttribute('id', 'whoseThatPokemonCard')
+    
+    const imgElement = document.createElement('img')
+    imgElement.classList.add('card-img-top', 'filtered-img')
+    imgElement.setAttribute('id', 'whoseThatPokemonImage')
+    imgElement.setAttribute('src', imageUrl)
+
+    const cardBody = document.createElement('div')
+    cardBody.classList.add('card-body')
+
+    const formContainer = document.createElement('form')
+    const formGroupContainer = document.createElement('div')
+    formGroupContainer.classList.add('form-group')
+    const labelElement = document.createElement('label')
+    labelElement.setAttribute('for', 'nameThatPokemon')
+    labelElement.innerText = `Who's That Pokemon?`
+    const input = document.createElement('input')
+    input.classList.add('form-control')
+    input.setAttribute('id', 'nameThatPokemonInput')
+    input.setAttribute('type', 'text')
+    input.placeholder = '...'
+    const submitButton = document.createElement('button')
+    submitButton.classList.add('btn', 'btn-primary')
+    submitButton.setAttribute('id', 'submitPokemonAnswer')
+    submitButton.setAttribute('type', 'submit')
+    submitButton.innerText = 'Submit'
+
+    submitButton.addEventListener('click', function(e) {
+      e.preventDefault()
+      this.setAttribute('disabled', 'true')
+    })
+
+    formGroupContainer.appendChild(labelElement)
+    formGroupContainer.appendChild(input)
+    formContainer.appendChild(formGroupContainer)
+    formContainer.appendChild(submitButton)
+
+    cardBody.appendChild(formContainer)
+    container.appendChild(imgElement)
+    container.appendChild(cardBody)
+
+    return container
+  }
+
+  // Function to display feedback to user
+  function createFeedBack(feedbackStr, canContiue) {
+    const cardContainer = document.getElementById('whoseThatPokemonCard')
+    const cardBody = document.createElement('div')
+    cardBody.classList.add('card-body')
+    cardBody.setAttribute('id', 'feedback')
+    const msg = document.createElement('p')
+    msg.innerText = feedbackStr
+    cardBody.appendChild(msg)
+
+    if (canContiue) {
+      let nextButton = document.createElement('button')
+      nextButton.classList.add('btn', 'btn-secondary')
+      nextButton.innerText = 'Click for Next Question'
+
+      nextButton.addEventListener('click', (e) => {
+        e.preventDefault()
+        cardContainer.remove()
+        playGame()
+      })
+      cardBody.appendChild(nextButton)
+    } else {
+      let playAgainButton = document.createElement('button')
+      playAgainButton.classList.add('btn', 'btn-success')
+      playAgainButton.innerText = 'Play Again?'
+      let goBackToListButton = document.createElement('button')
+      goBackToListButton.classList.add('btn', 'btn-secondary')
+      goBackToListButton.innerText = 'Return to Pokedex'
+
+      playAgainButton.addEventListener('click', (e) => {
+        e.preventDefault()
+        cardContainer.remove()
+        resetGame()
+      })
+
+      goBackToListButton.addEventListener('click', (e) => {
+        e.preventDefault()
+        cardContainer.remove()
+        endGame()
+      })
+      cardBody.appendChild(playAgainButton)
+      cardBody.appendChild(goBackToListButton)
+    }
+    
+    cardContainer.appendChild(cardBody)
+  }
+})()
