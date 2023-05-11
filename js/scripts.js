@@ -864,6 +864,7 @@ let PokemonDOMFactory = (function() {
       function appendSections() {
         const sectionsArr = []
         const { stats, profile, evolutions, moves } = pokemon
+        console.log(moves.library.data.natural)
         sectionsArr.push(createNameImageTypeStats(stats.stats))
         sectionsArr.push(createProfileDetails(profile))
         if (evolutions.chain.length > 1) sectionsArr.push(createEvolutions(evolutions.chain))
@@ -903,15 +904,16 @@ let PokemonDOMFactory = (function() {
     initFilterAndSort()
   }
 
-  $('#myModal').on('show.bs.modal', function(e) {
+
+  $('#myModal').on('show.bs.modal', async function(e) {
     let pokemonCard = $(e.relatedTarget)[0]
-    // Get pokemon from repository
-    let pokemon = PokemonRepository.getPokemon(pokemonCard.getAttribute('data-pokemon-id'))
-    PokemonRepository.getDetails(pokemonCard.getAttribute('data-pokemon-id')).then(() => {
-      $('#myModal').find('.modal-title').text(StrHelpers.capitalize(pokemon.data.name))
-      $('#myModal').find('.modal-body').html(ModalBuilder.show(pokemon))
-    }).catch(e => console.error(e))
-    
+    let promise = new Promise((resolve, reject) => {
+      PokemonRepository.fetchMoves(pokemonCard.getAttribute('data-pokemon-id')).then(res => resolve(res))
+    })
+    let result = await promise
+
+    $('#myModal').find('.modal-title').text(StrHelpers.capitalize(result.data.name))
+    $('#myModal').find('.modal-body').html(ModalBuilder.show(result))
   })
   
   // Create Element: Pokemon Card Item
@@ -1035,31 +1037,6 @@ let PokemonRepository = (function() {
     }
   }
 
-  // CALL WHEN OPENING A MODAL
-  const fetchMovesData = async function(pokemon) {
-    try {
-      const { moves } = pokemon.moves
-      const movesArr = []
-      moves.forEach( async (_m) => {
-        const { move, version_group_details } = _m
-        const { name, url } = move
-        const res = await fetch(url)
-        const json = await res.json().then(res => {
-          const { accuracy, power, pp, type, effect_entries } = res
-          return new Move(name, version_group_details, accuracy, power, pp, type, effect_entries)
-        })
-        movesArr.push(json)
-      })
-      const movesLibrary = await makeMovesLibrary(movesArr)
-      pokemon.moves = {
-        get library() { return movesLibrary }
-      }
-      return pokemon
-    } catch (err) {
-      console.error(err)
-    }
-  }
-
   const finalizePokemon = async function(pokemonArr) {
     try {
       for (let i = 0; i < pokemonArr.length; i++) {
@@ -1071,16 +1048,43 @@ let PokemonRepository = (function() {
       console.error(err)
     } 
   }
-  
-  const fetchRestOfPokemonDetails = async function(id) {
-    try {
-      const pokemon = pokemonMap.get(parseInt(id))
-      if (pokemon.moves.hasOwnProperty('library')) return pokemon
-      let res = await fetchMovesData(pokemon)
-      return res
-    } catch(e) {
-      console.error(e)
+
+  // CALL WHEN OPENING A MODAL
+  const fetchMovesData = async function(moves) {
+    let arr = []
+    for (let i = 0; i < moves.length; i++) {
+      const currentMove = moves[i]
+      const { move, version_group_details } = moves[i]
+      const { name, url } = move
+
+      let res = await fetch(url)
+      let json = await res.json()
+
+      const { accuracy, power, pp, type, effect_entries } = json
+      const moveObj = new Move(name, version_group_details, accuracy, power, pp, type, effect_entries)
+      arr.push(moveObj)
     }
+
+    let result = await makeMovesLibrary(arr)
+    return result
+  }
+
+  
+  
+  const fetchMovesLibrary = async function(id) {
+    const pokemon = pokemonMap.get(parseInt(id))
+    if (pokemon.moves.hasOwnProperty('library')) return false
+    const { moves } = pokemon.moves
+
+    let promise = new Promise((resolve, reject) => fetchMovesData(moves).then(res => resolve(res)))
+    
+    let result = await promise.then(res => {
+      pokemon.moves = {
+        get library() { return res }
+      }
+      return pokemon
+    })
+    return result
   }
 
   // Function to get the id of the species at the end of the url: found at https://stackoverflow.com/questions/39160539/regex-pattern-to-get-number-between-forward-slashes-at-the-end-of-a-url
@@ -1126,17 +1130,13 @@ let PokemonRepository = (function() {
     }
   }
 
-  function makeMovesLibrary(moves) {
+  async function makeMovesLibrary(moves) {
     const moveTypes = {
-      natural: [],
-      machine: [],
-      tutor: [],
-      egg: []
+      natural: moves.filter(move => move.details.group === 'natural'),
+      machine: moves.filter(move => move.details.group === 'machine'),
+      tutor: moves.filter(move => move.details.group === 'tutor'),
+      egg: moves.filter(move => move.details.group === 'egg')
     }
-    moves.forEach(move => {
-      const moveGroup = move.details.group
-      if (moveTypes[moveGroup]) moveTypes[moveGroup].push(move)
-    })
     return new MovesLibrary(moveTypes)
   }
 
@@ -1312,14 +1312,16 @@ let PokemonRepository = (function() {
     return pokemonMap.get(parseInt(id))
   }
 
+  function initFetching() {
+    fetchPokemon()
+      .then(fetchDataOfPokemon)
+      .then(fetchProfileData)
+      .then(finalizePokemon)
+  }
+
   return {
-    init: () => {
-      fetchPokemon()
-        .then(fetchDataOfPokemon)
-        .then(fetchProfileData)
-        .then(finalizePokemon)
-    },
-    getDetails: fetchRestOfPokemonDetails,
+    init: initFetching,
+    fetchMoves: fetchMovesLibrary,
     filter: filterPokemon,
     search: searchPokemon,
     sort: sortPokemon,
