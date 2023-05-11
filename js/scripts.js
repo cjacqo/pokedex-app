@@ -4,7 +4,7 @@ let PokemonDOMFactory = (function() {
   // DOM Element: Container of Pokemon
   const pokemonCardsContainer = document.getElementById('pokemonCardsContainer')
   const row = document.createElement('div')
-  row.classList.add('row', 'justify-content-center', 'scroll-y')
+  row.classList.add('row', 'justify-content-center', 'scroll-y', 'larger-mobile')
   pokemonCardsContainer.appendChild(row)
   // IIFE for string helpers
   const StrHelpers = (function() {
@@ -85,53 +85,6 @@ let PokemonDOMFactory = (function() {
   // IIFE for common elements
   const DOMBuilder = (function() {
 
-    // Create Types Container & Elements
-    function createTypesElement(types) {
-      const container = document.createElement('div')
-      container.classList.add('types-container', 'flex')
-      types.forEach(t => {
-        const typeElement = document.createElement('span')
-        typeElement.classList.add('type', t.type.name, 'white-font')
-        typeElement.innerText = t.type.name.toUpperCase()
-        container.appendChild(typeElement)
-      })
-      return container
-    }
-
-    // Create Stats Container & Elements
-    function createStatsElement(stats, mainType) {
-      const container = document.createElement('div')
-      container.classList.add('stats-container', 'flex', 'col')
-      stats.forEach(s => {
-        const { base_stat, stat } = s
-        const statWrapper = document.createElement('div')
-        statWrapper.classList.add('stat-wrapper', 'flex')
-        const statTitle = document.createElement('span')
-        statTitle.classList.add('stat-title')
-        statTitle.innerText = stat.name.length <= 2 ? stat.name.toUpperCase()
-          : stat.name === 'special-attack' ? 'SP Attk'
-          : stat.name === 'special-defense' ? 'SP Def'
-          : StrHelpers.capitalize(stat.name)
-        const statBarContainer = document.createElement('span')
-        statBarContainer.classList.add('stat-bar', 'flex')
-        const statBarStatBg = document.createElement('div')
-        statBarStatBg.classList.add('stat-bar-bg', mainType.type.name)
-        statBarStatBg.style.transform = `scaleX(${base_stat / 100})`
-        const statBarStatFg = document.createElement('div')
-        statBarStatFg.classList.add('stat-bar-fg', 'white-font')
-        const baseStatElement = document.createElement('span')
-        baseStatElement.classList.add('base-stat')
-        baseStatElement.innerText = base_stat
-        statBarStatFg.appendChild(baseStatElement)
-        statBarContainer.appendChild(statBarStatBg)
-        statBarContainer.appendChild(statBarStatFg)
-        statWrapper.appendChild(statTitle)
-        statWrapper.appendChild(statBarContainer)
-        container.appendChild(statWrapper)
-      })
-      return container
-    }
-
     // Create Container
     function createContainer(...classNames) {
       const container = document.createElement('div')
@@ -144,78 +97,6 @@ let PokemonDOMFactory = (function() {
       const container = createContainer(...containerClassNames)
       const textElement = document.createElement(element ? element : 'p')
       textElement.innerText = str
-      container.appendChild(textElement)
-      return container
-    }
-
-    // Create Table Row
-    function createTableRow(rowTitle, rowData, rowParent) {
-      const container = createContainer('table-row', rowParent, 'flex', 'jc-sb')
-      const rowTitleContainer = createContainer('row-item-container')
-      const rowTitleElement = document.createElement('p')
-      rowTitleElement.classList.add('table-row-title', 'bold')
-      rowTitleElement.innerText = rowTitle + ':'
-      rowTitleContainer.appendChild(rowTitleElement)
-      const rowDataContainer = createContainer('row-item-container')
-      const rowDataElement = document.createElement('p')
-      rowDataElement.classList.add('table-row-data')
-      rowDataElement.innerText = rowData
-      rowDataContainer.appendChild(rowDataElement)
-      container.appendChild(rowTitleContainer)
-      container.appendChild(rowDataContainer)
-      return container
-    }
-
-    // Create Image Container & Element
-    function createImageElement(url) {
-      const container = document.createElement('div')
-      container.classList.add('img-container')
-      const img = document.createElement('img')
-      img.setAttribute('src', url)
-      container.appendChild(img)
-      return container
-    }
-
-    // Create Name Types Bar
-    function createNameTypesBar(name, types) {
-      const container = document.createElement('div')
-      container.classList.add('name-types-container', 'flex', 'ai-c', 'jc-sa')
-      const nameContainer = document.createElement('div')
-      nameContainer.classList.add('name-container')
-      const nameElement = document.createElement('h6')
-      nameElement.innerText = StrHelpers.capitalize(name)
-      nameContainer.appendChild(nameElement)
-      const typesContainer = document.createElement('div')
-      typesContainer.classList.add('types-container', 'flex')
-      types.forEach(t => {
-        let typeElement = document.createElement('div')
-        typeElement.classList.add('type-circle', t.type.name)
-        typesContainer.appendChild(typeElement)
-      })
-      container.appendChild(nameContainer)
-      container.appendChild(typesContainer)
-      return container
-    }
-
-    // Create Sub Header
-    function createSubHeader(title, mainType) {
-      const container = document.createElement('div')
-      container.classList.add('sub-header-container')
-      const subHeaderElement = document.createElement('h2')
-      subHeaderElement.classList.add('sub-header')
-      if (mainType) subHeaderElement.classList.add(mainType)
-      subHeaderElement.innerText = title
-      container.appendChild(subHeaderElement)
-      return container
-    }
-    
-    // Create Name Bar
-    function createNameBar(name, mainType) {
-      const container = document.createElement('div')
-      container.classList.add('name-bar-container')
-      if (mainType) container.classList.add(mainType.type.name, 'white-font')
-      const textElement = document.createElement('h1')
-      textElement.innerText = StrHelpers.capitalize(name)
       container.appendChild(textElement)
       return container
     }
@@ -427,36 +308,38 @@ let PokemonDOMFactory = (function() {
     function createPokemonCard(pokemon) {
       const { name, imageUrl, types } = pokemon.data
       const cardContainer = document.createElement('div')
-      cardContainer.classList.add('border-dark', 'pokemon-card', 'text-white', 'bg-dark')
+      cardContainer.classList.add('border-dark', 'pokemon-card', 'text-white', 'bg-dark', 'rounded', 'p-5', 'position-relative')
       cardContainer.setAttribute('data-pokemon', name)
       cardContainer.setAttribute('data-pokemon-id', pokemon.data.id)
       cardContainer.setAttribute('data-toggle', 'modal')
       cardContainer.setAttribute('data-target', '#myModal')
 
       const imgContainer = document.createElement('div')
-      imgContainer.classList.add('img-container')
+      imgContainer.classList.add('img-container', 'flex-2')
       const imgElement = document.createElement('img')
-      imgElement.classList.add('card-img-top')
+      imgElement.classList.add('card-img-top', 'pokemon-card-image')
       imgElement.setAttribute('src', imageUrl)
       imgContainer.appendChild(imgElement)
 
       const cardBody = document.createElement('div')
-      cardBody.classList.add('card-body')
+      cardBody.classList.add('card-body', 'd-flex', 'flex-column', 'align-items-start', 'justify-content-start', 'p-0')
 
-      const cardTitle = document.createElement('h5')
-      cardTitle.classList.add('card-title')
+      const cardTitle = document.createElement('h6')
+      cardTitle.classList.add('card-title', 'mb-0', 'pokemon-card-title', 'text-light')
       cardTitle.innerText = StrHelpers.capitalize(name)
 
-      const cardText = document.createElement('p')
-      cardText.classList.add('card-text')
+      const typesContainer = document.createElement('span')
+      typesContainer.classList.add('d-flex', 'justify-content-between', 'pokemon-card-types-element')
       types.forEach(type => {
         let typeElement = document.createElement('span')
-        typeElement.classList.add('type-circle', type.type.name)
-        cardText.appendChild(typeElement)
+        typeElement.classList.add('badge')
+        typeElement.dataset.pokemonType = type.type.name
+        typeElement.innerText = StrHelpers.capitalize(type.type.name)
+        typesContainer.appendChild(typeElement)
       })
 
       cardBody.appendChild(cardTitle)
-      cardBody.appendChild(cardText)
+      cardBody.appendChild(typesContainer)
 
       cardContainer.appendChild(imgContainer)
       cardContainer.appendChild(cardBody)
@@ -548,11 +431,6 @@ let PokemonDOMFactory = (function() {
     }
     
     return {
-      container: createContainer,
-      image: createImageElement,
-      cardHeader: createNameTypesBar,
-      nameBar: createNameBar,
-      subHeader: createSubHeader,
       navigation: createNavigation,
       emptyMessage: createEmptyMessage,
       pokemonCard: createPokemonCard,
@@ -674,6 +552,7 @@ let PokemonDOMFactory = (function() {
         const titleContainer = document.createElement('div')
         titleContainer.classList.add('flex-grow-1', 'mt-2')
         const titleElement = document.createElement('h6')
+        titleElement.classList.add('lead')
         titleElement.innerText = 'Profile'
         titleContainer.appendChild(titleElement)
         sectionContainer.appendChild(titleContainer)
@@ -779,6 +658,7 @@ let PokemonDOMFactory = (function() {
         const titleContainer = document.createElement('div')
         titleContainer.classList.add('flex-grow-1', 'mt-2')
         const titleElement = document.createElement('h6')
+        titleElement.classList.add('lead')
         titleElement.innerText = 'Evolutions'
         titleContainer.appendChild(titleElement)
         sectionContainer.appendChild(titleContainer)
@@ -852,6 +732,7 @@ let PokemonDOMFactory = (function() {
         const titleContainer = document.createElement('div')
         titleContainer.classList.add('flex-grow-1', 'mt-2')
         const titleElement = document.createElement('h6')
+        titleElement.classList.add('lead')
         titleElement.innerText = 'Moves'
         titleContainer.appendChild(titleElement)
         sectionContainer.appendChild(titleContainer)
@@ -910,8 +791,9 @@ let PokemonDOMFactory = (function() {
             moveTitleElement.classList.add('card-title', 'm-0', 'flex-grow-1')
             moveTitleElement.innerText = StrHelpers.capitalize(name)
 
-            const moveTypeElement = document.createElement('p')
-            moveTypeElement.classList.add('card-text', 'small')
+            const moveTypeElement = document.createElement('span')
+            moveTypeElement.classList.add('badge', 'small', 'text-light')
+            moveTypeElement.dataset.pokemonType = type
             moveTypeElement.innerText = type.toUpperCase()
 
             
