@@ -1382,7 +1382,6 @@ let GameControl = (function() {
     while (output === null || pokemonUsedIds.includes(output)) {
       output = Math.floor(Math.random() * (150 - 1) + 1)
     }
-
     return output
   }
 
@@ -1391,14 +1390,13 @@ let GameControl = (function() {
     pokemonCardsContainer.children[0].remove()
 
     // Hide the filter by types containers
-    document.getElementById('filterTypesContainer-Desktop').style.display = 'none'
-    document.getElementById('filterTypesContainer-Mobile').style.display = 'none'
+    document.getElementById('filterTypesContainer-Desktop').classList.toggle('hidden')
+    document.getElementById('navbarToggler').setAttribute('disabled', 'true')
   }
   
   // Function to set up the game and start it
   function playGame() {
     const pokemon = pokemonMap.get(getRandomNumber())
-    console.log(pokemon)
     const { name, id, imageUrl } = pokemon.data
     pokemonUsedIds.push(id)
     pokemonCardsContainer.appendChild(createQuestionCard(imageUrl))
@@ -1412,11 +1410,9 @@ let GameControl = (function() {
       let feedbackStr
 
       if (userAnswer.toLowerCase().trim() == name) {
-        console.log('CORRECT!')
         feedbackStr = `Correct! The pokemon is ${name}`
         correctAnswers++
       } else {
-        console.log("INCORRECT")
         lives--
         wrongAnswers++
         if (lives === 0) feedbackStr = `Game over! You answered a total of ${correctAnswers} right out of ${correctAnswers + wrongAnswers}. Better luck next time!`
@@ -1448,8 +1444,8 @@ let GameControl = (function() {
     correctAnswers = 0
     wrongAnswers = 0
     startGameButton.removeAttribute('disabled')
-    document.getElementById('filterTypesContainer-Desktop').style.display = 'initial'
-    document.getElementById('filterTypesContainer-Mobile').style.display = 'initial'
+    document.getElementById('filterTypesContainer-Desktop').classList.toggle('hidden')
+    document.getElementById('navbarToggler').removeAttribute('disabled')
     PokemonDOMFactory.loadPokemonCards()
   }
 
