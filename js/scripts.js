@@ -864,10 +864,10 @@ let PokemonDOMFactory = (function() {
       function appendSections() {
         const sectionsArr = []
         const { stats, profile, evolutions, moves } = pokemon
-        sectionsArr.push(createNameImageTypeStats(stats))
+        sectionsArr.push(createNameImageTypeStats(stats.stats))
         sectionsArr.push(createProfileDetails(profile))
-        if (evolutions.length > 1) sectionsArr.push(createEvolutions(evolutions))
-        sectionsArr.push(createMoves(moves))
+        if (evolutions.chain.length > 1) sectionsArr.push(createEvolutions(evolutions.chain))
+        sectionsArr.push(createMoves(moves.library))
         sectionsArr.forEach(section => container.appendChild(section))
       }
 
@@ -907,9 +907,8 @@ let PokemonDOMFactory = (function() {
     let pokemonCard = $(e.relatedTarget)[0]
     // Get pokemon from repository
     let pokemon = PokemonRepository.getPokemon(pokemonCard.getAttribute('data-pokemon-id'))
-    PokemonRepository.getDetails(pokemon).then(() => {
+    PokemonRepository.getDetails(pokemonCard.getAttribute('data-pokemon-id')).then(() => {
       $('#myModal').find('.modal-title').text(StrHelpers.capitalize(pokemon.data.name))
-      console.log(pokemon)
       $('#myModal').find('.modal-body').html(ModalBuilder.show(pokemon))
     }).catch(e => console.error(e))
     
@@ -945,165 +944,144 @@ let PokemonRepository = (function() {
   // Empty array of pokemon
   const pokemonMap = new Map()
   // API URL
-  const apiUrlBuilder = (endpoint, idName) => `https://pokeapi.co/api/v2/${endpoint}/${idName}`
   const apiUrl = 'https://pokeapi.co/api/v2/pokemon/?limit=150'
 
-  const fetchPokemon = function() {
-    return new Promise((resolve, reject) => {
-      fetch(apiUrl)
-        .then(res => res.json())
-        .then(data => {
-          return data.results.map(p => {
-            return {
-              name: p.name,
-              detailsUrl: p.url
-            }
-          })
-        })
-        .then(res => {
-          return res.map(p => {
-            let pokemon = fetch(p.detailsUrl)
-                            .then(res => res.json())
-                            .then(res => {
-                              p.id = res.id
-                              p.imageUrl = res.sprites.front_default
-                              p.types = res.types
-                              return p
-                            })
-            return pokemon
-          })
-          
-        })
-        .then(res => Promise.all(res).then(pokemon => {
-          resolve(makePokemonObj(pokemon))
-        }))
-        .catch(e => reject(e))
-    })
-  }
-
-  const makePokemonObj = function(data) {
-    function PokemonObj(name, detailsUrl, id, imageUrl, types) {
-      this.data = {
-        get name() { return name },
-        get detailsUrl() { return detailsUrl },
-        get id() { return id },
-        get imageUrl() { return imageUrl },
-        get types() { return types }
-      }
+  function PokemonItem({name, id, detailsUrl, imageUrl, speciesUrl, types, stats, abilities, height, weight, moves, captureRate, eggGroups, genderRate, hatchSteps, baseHappiness, evolutions}) {
+    this.data = {
+      get name() { return name },
+      get id() { return id },
+      get detailsUrl() { return detailsUrl },
+      get imageUrl() { return imageUrl },
+      get types() { return types }
     }
-
-    Object.defineProperties(PokemonObj.prototype, {
-      name: {
-        get: function() { return this._name }
-      },
-      detailsUrl: {
-        get: function() { return this._detailsUrl }
-      }
-    })
-
-    data.forEach(item => {
-      const { name, detailsUrl, id, imageUrl, types } = item
-      let pokemon = new PokemonObj(name, detailsUrl, id, imageUrl, types)
-      pokemonMap.set(pokemon.data.id, pokemon)
-      PokemonDOMFactory.createPokemon(pokemon)
-    })
+    this.stats = {
+      get stats() { return stats }
+    }
+    this.profile = {
+      get abilities() { return abilities },
+      get height() { return height },
+      get weight() { return weight },
+      get eggGroups() { return eggGroups },
+      get captureRate() { return captureRate },
+      get genderRate() { return genderRate },
+      get hatchSteps() { return hatchSteps },
+      get baseHappiness() { return baseHappiness }
+    },
+    this.evolutions = {
+      get chain() { return evolutions }
+    }
+    this.moves = {
+      get moves() { return moves }
+    }
+  }
+  
+  const fetchPokemon = async function() {
+    const res = await fetch(apiUrl)
+    const json = await res.json()
+    return json.results
   }
 
-  const fetchRestOfPokemonDetails = async function(pokemon) {
+  const fetchDataOfPokemon = async function(pokemonArr) {
     try {
-      pokemon.stats = await fetchPokemonStats(pokemon)
-      pokemon.profile = await fetchPokemonProfile(pokemon)
-      pokemon.evolutions = await fetchPokemonEvolutions(pokemon)
-      pokemon.moves = await fetchPokemonMoves(pokemon)
+      let responses = []
+      for (let i = 0; i < pokemonArr.length; i++) {
+        const {name, url } = pokemonArr[i]
+        const res = await fetch(url)
+        const json = await res.json()
+        responses.push({
+          name,
+          detailsUrl: url,
+          id: json.id,
+          imageUrl: json.sprites.front_default,
+          abilities: json.abilities,
+          stats: json.stats,
+          types: json.types,
+          height: json.height,
+          weight: json.height,
+          moves: json.moves,
+          speciesUrl: json.species.url
+        })
+        let tempObj = {
+          data: { name, imageUrl: json.sprites.front_default, types: json.types, id: json.id }
+        }
+        PokemonDOMFactory.createPokemon(tempObj)
+      }
+      return responses
+    } catch(err) {
+      console.error(err)
+    }
+  }
+
+  const fetchProfileData = async function(pokemonArr) {
+    try {
+      for (let i = 0; i < pokemonArr.length; i++) {
+        const currentPokemon = pokemonArr[i]
+        const { speciesUrl } = currentPokemon
+        const res = await fetch(speciesUrl)
+        const json = await res.json()
+
+        currentPokemon.captureRate = json.capture_rate
+        currentPokemon.eggGroups = json.egg_groups
+        currentPokemon.genderRate = json.gender_rate
+        currentPokemon.hatchSteps = json.hatch_counter * 255
+        currentPokemon.baseHappiness = json.base_happiness
+        currentPokemon.evolutions = await fetch(json.evolution_chain.url)
+                                            .then(res => res.json())
+                                            .then(res => { return parseEvolutions(res.chain) })
+      }
+      return pokemonArr
+    } catch(err) {
+      console.error(err)
+    }
+  }
+
+  // CALL WHEN OPENING A MODAL
+  const fetchMovesData = async function(pokemon) {
+    try {
+      const { moves } = pokemon.moves
+      const movesArr = []
+      moves.forEach( async (_m) => {
+        const { move, version_group_details } = _m
+        const { name, url } = move
+        const res = await fetch(url)
+        const json = await res.json().then(res => {
+          const { accuracy, power, pp, type, effect_entries } = res
+          return new Move(name, version_group_details, accuracy, power, pp, type, effect_entries)
+        })
+        movesArr.push(json)
+      })
+      const movesLibrary = await makeMovesLibrary(movesArr)
+      pokemon.moves = {
+        get library() { return movesLibrary }
+      }
+      return pokemon
+    } catch (err) {
+      console.error(err)
+    }
+  }
+
+  const finalizePokemon = async function(pokemonArr) {
+    try {
+      for (let i = 0; i < pokemonArr.length; i++) {
+        const currentPokemon = pokemonArr[i]
+        const pokemon = new PokemonItem(currentPokemon)
+        pokemonMap.set(pokemon.data.id, pokemon)
+      }
+    } catch (err) {
+      console.error(err)
+    } 
+  }
+  
+  const fetchRestOfPokemonDetails = async function(id) {
+    try {
+      const pokemon = pokemonMap.get(parseInt(id))
+      if (pokemon.moves.hasOwnProperty('library')) return pokemon
+      let res = await fetchMovesData(pokemon)
+      return res
     } catch(e) {
       console.error(e)
     }
   }
-  const fetchPokemonStats = async function(pokemon) {
-    let detailsUrl = pokemon.data.detailsUrl
-    let promise = new Promise((resolve, reject) => {
-      fetch(detailsUrl)
-        .then(res => res.json())
-        .then(res => resolve(res.stats))
-        .catch(e => reject(e))
-    })
-    let result = await promise
-    return result
-  }
-  const fetchPokemonProfile = async function(pokemon) {
-    let speciesUrl = apiUrlBuilder('pokemon-species', pokemon.data.id)
-    let promise = new Promise((resolve, reject) => {
-      fetch(speciesUrl)
-        .then(res => res.json())
-        .then(res => {
-          const profile = {
-            captureRate: res.capture_rate,
-            eggGroups: res.egg_groups,
-            genderRate: res.gender_rate,
-            hatchSteps: res.hatch_counter * 255,
-            baseHappiness: res.base_happiness
-          }
-          return fetch(pokemon.data.detailsUrl)
-                  .then(res => res.json())
-                  .then(res => {
-                    profile.abilities = res.abilities
-                    profile.height = res.height
-                    profile.weight = res.weight
-                    return profile
-                  })
-        })
-        .then(res => resolve(res))
-        .catch(e => reject(e))
-    })
-    let result = await promise
-    return result
-  }
-  const fetchPokemonEvolutions = async function(pokemon) {
-    let speciesUrl = apiUrlBuilder('pokemon-species', pokemon.data.id)
-    let promise = new Promise((resolve, reject) => {
-      fetch(speciesUrl)
-        .then(res => res.json())
-        .then(res => {
-          return fetch(res.evolution_chain.url)
-                  .then(res => res.json())
-                  .then(res => {
-                    return parseEvolutions(res.chain)
-                  })
-        })
-        .then(res => resolve(res))
-        .catch(e => reject(e))
-    })
-    let result = await promise
-    return result
-  }
-  const fetchPokemonMoves = async function(pokemon) {
-    let movesUrl = apiUrlBuilder('pokemon', pokemon.data.id)
-    let promise = new Promise((resolve, reject) => {
-      fetch(movesUrl)
-        .then(res => res.json())
-        .then(res => {
-          return res.moves.map(m => {
-            const { move, version_group_details } = m
-            const { name, url } = move
-            return fetch(url)
-                    .then(res => res.json())
-                    .then(res => {
-                      const { accuracy, power, pp, type, effect_entries } = res
-                      return new Move(name, version_group_details, accuracy, power, pp, type, effect_entries)
-                    })
-                    .catch(e => console.error(e))
-          })
-        })
-        .then(res => {
-          Promise.all(res).then(values => {
-            return resolve(makeMovesLibrary(values))
-          })
-        })
-        .catch(e => reject(e))
-    })
-    let result = await promise
-    return result
-  }  
 
   // Function to get the id of the species at the end of the url: found at https://stackoverflow.com/questions/39160539/regex-pattern-to-get-number-between-forward-slashes-at-the-end-of-a-url
   function getId(s) {
@@ -1335,7 +1313,12 @@ let PokemonRepository = (function() {
   }
 
   return {
-    init: fetchPokemon,
+    init: () => {
+      fetchPokemon()
+        .then(fetchDataOfPokemon)
+        .then(fetchProfileData)
+        .then(finalizePokemon)
+    },
     getDetails: fetchRestOfPokemonDetails,
     filter: filterPokemon,
     search: searchPokemon,
