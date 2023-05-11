@@ -865,7 +865,7 @@ let PokemonDOMFactory = (function() {
         const { stats, profile, evolutions, moves } = pokemon
         sectionsArr.push(createNameImageTypeStats(stats))
         sectionsArr.push(createProfileDetails(profile))
-        sectionsArr.push(createEvolutions(evolutions))
+        if (evolutions.length > 1) sectionsArr.push(createEvolutions(evolutions))
         sectionsArr.push(createMoves(moves))
         sectionsArr.forEach(section => container.appendChild(section))
       }
