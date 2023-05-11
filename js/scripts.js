@@ -920,6 +920,12 @@ let PokemonDOMFactory = (function() {
     $('#myModal').find('.modal-title').text(StrHelpers.capitalize(result.data.name))
     $('#myModal').find('.modal-body').html(ModalBuilder.show(result))
   })
+
+  $('#myModal').on('hidden.bs.modal', function(e) {
+    let pokemonCard = $(e.relatedTarget)[0]
+    $('#myModal').find('.modal-title').text('')
+    $('#myModal').find('.modal-body').html('')
+  })
   
   // Create Element: Pokemon Card Item
   function createPokemonCard(pokemon) {
