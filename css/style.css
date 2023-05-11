@@ -147,7 +147,7 @@ nav {
   display: none;
 }
 #filterTypesContainer-Desktop {
-  z-index: 5000;
+  z-index: 1040;
 }
 
 @media (max-width: 992px) {
@@ -577,33 +577,42 @@ nav {
 }
 
 /* When the browser is at least 530px and above */
-@media screen and (min-width: 530px) {
-  /* IMAGE TYPES STATS CONTAINER */
-  /* .img-types-stats-container {
-    flex-direction: row;
-    width: 95%;
-    margin: 0 auto;
+@media screen and (min-width: 576px) {
+  .modal-dialog {
+    max-width: 759px !important;
+    margin: 1.75rem auto;
   }
-  .img-types-stats-container > * {
-    flex-grow: 1;
+  .modal-body-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    grid-template-rows: minmax(500px, 550px) minmax(600px, 630px) auto;
+    grid-template-areas: 
+      'imgTypeStats profile'
+      'evolutions evolutions'
+      'moves moves';
+    justify-items: center;
+    align-items: end;
   }
-  .img-types-stats-container > .img-container {
-    background-color: red;
-    margin-right: 1rem;
+  #imageTypeStatsSection {
+    grid-area: imgTypeStats;
+    width: 100%;
   }
-  .types-stats-container {
-    align-items: flex-start;
-  } */
+  #imageTypeStatsSection .figure {
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+  #profileDetailsSection {
+    grid-area: profile;
+    width: 100%;
+  }
+  #evolutionsSection {
+    grid-area: evolutions;
+    width: 100%;
+  }
+  #movesSection {
+    grid-area: moves;
+    width: 100%;
+  }
 }
-
-/* Small devices (landscape phones, 576px and up) */
-/* @media (max-width: 576px) {
-  .row-content {
-    flex-direction: column;
-  }
-}
-@media only screen and (min-device-width: 577px) and (max-device-width: 1200px) {
-  .row-content {
-    flex-direction: row;
-  }
-} */
