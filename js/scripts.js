@@ -860,7 +860,7 @@ let PokemonDOMFactory = (function() {
         return sectionContainer
       }
       
-      function createContentSections() {
+      function appendSections() {
         const sectionsArr = []
         const { stats, profile, evolutions, moves } = pokemon
         sectionsArr.push(createNameImageTypeStats(stats))
@@ -870,7 +870,7 @@ let PokemonDOMFactory = (function() {
         sectionsArr.forEach(section => container.appendChild(section))
       }
 
-      createContentSections()
+      appendSections()
       return container
     }
 
@@ -1335,4 +1335,3 @@ let PokemonRepository = (function() {
 
 PokemonRepository.init()
 PokemonDOMFactory.init()
-// PokemonDOMFactory.createNavigation()
