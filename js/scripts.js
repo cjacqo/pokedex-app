@@ -851,10 +851,15 @@ let PokemonDOMFactory = (function() {
           return cardContainer
         }
 
-        accordionContainer.appendChild(createAccordionCard(moves.sortNatural(), 'natural'))
-        accordionContainer.appendChild(createAccordionCard(moves.sortAlphabetical().machine, 'machine'))
-        accordionContainer.appendChild(createAccordionCard(moves.sortAlphabetical().tutor, 'tutor'))
-        accordionContainer.appendChild(createAccordionCard(moves.sortAlphabetical().egg, 'egg'))
+        let naturalMoves = moves.sortNatural()
+        let machineMoves = moves.sortAlphabetical().machine
+        let tutorMoves = moves.sortAlphabetical().tutor
+        let eggMoves = moves.sortAlphabetical().egg
+
+        if ( naturalMoves !== 0) accordionContainer.appendChild(createAccordionCard(naturalMoves, 'natural'))
+        if ( machineMoves !== 0) accordionContainer.appendChild(createAccordionCard(machineMoves, 'machine'))
+        if ( tutorMoves !== 0) accordionContainer.appendChild(createAccordionCard(tutorMoves, 'tutor'))
+        if ( eggMoves !== 0) accordionContainer.appendChild(createAccordionCard(eggMoves, 'egg'))
         
         sectionContainer.appendChild(accordionContainer)
         
@@ -1073,7 +1078,7 @@ let PokemonRepository = (function() {
   
   const fetchMovesLibrary = async function(id) {
     const pokemon = pokemonMap.get(parseInt(id))
-    if (pokemon.moves.hasOwnProperty('library')) return false
+    if (pokemon.moves.hasOwnProperty('library')) return pokemon
     const { moves } = pokemon.moves
 
     let promise = new Promise((resolve, reject) => fetchMovesData(moves).then(res => resolve(res)))
