@@ -385,7 +385,6 @@ nav {
   min-height: 240px;
   max-width: 270px;
   transition: all 0.25s ease-in;
-
   padding: 0 !important;
 }
 
@@ -577,7 +576,8 @@ nav {
 @media screen and (min-width: 681px) {
   .modal-dialog {
     max-width: 759px !important;
-    margin: 1.75rem auto;
+    margin: 0 auto;
+    /* margin: 1.75rem auto; */
   }
   .modal-body-wrapper {
     display: grid;
