@@ -754,7 +754,7 @@ let PokemonDOMFactory = (function() {
           cardHeader.classList.add('card-header', 'bg-secondary', 'text-light')
           cardHeader.setAttribute('id', `${groupName}Heading`)
           const headerWrapper = document.createElement('h5')
-          headerWrapper.classList.add('mb-0', 'moves-title-element')
+          headerWrapper.classList.add('mb-0', 'moves-title-element', 'h6', 'd-flex', 'justify-content-between')
           headerWrapper.innerText = StrHelpers.capitalize(groupName) + ' Moves'
           const totalMovesCount = document.createElement('span')
           totalMovesCount.innerText = moves.length
@@ -791,7 +791,7 @@ let PokemonDOMFactory = (function() {
             if (level > 0) {
               const levelElement = document.createElement('p')
               levelElement.classList.add('small')
-              levelElement.innerText = level
+              levelElement.innerText = `${level}: `
               moveCardBody.appendChild(levelElement)
             }
 
@@ -954,7 +954,8 @@ let PokemonDOMFactory = (function() {
     createPokemon: createPokemonCard,
     createNavigation: DOMBuilder.navigation,
     createEmptyMessage: DOMBuilder.emptyMessage,
-    loadPokemonCards
+    loadPokemonCards,
+    StrHelpers
   }
 
 })()
@@ -1407,7 +1408,10 @@ let GameControl = (function() {
     correctAnswers = 0
     wrongAnswers = 0
     if (explain) return explainGame()
-    else return playGame()
+    else {
+      createLives()
+      playGame()
+    }
   }
   
   function endGame() {
@@ -1484,17 +1488,20 @@ let GameControl = (function() {
     const { name, id, imageUrl } = pokemon.data
     pokemonUsedIds.push(id)
     pokemonCardsContainer.appendChild(createQuestionCard(imageUrl))
+    let inputElement = document.getElementById('nameThatPokemonInput')
+    inputElement.focus()
     
     document.getElementById('submitPokemonAnswer').onclick = function() {
-      let userAnswer = document.getElementById('nameThatPokemonInput').value
+      inputElement.setAttribute('disabled', 'true')
+      let userAnswer = inputElement.value
 
-      let img = document.getElementById('whoseThatPokemonImage')
+      let img = document.getElementById('whosThatPokemonImage')
       img.classList.remove('filtered-img')
 
       let feedbackStr
 
       if (userAnswer.toLowerCase().trim() == name) {
-        feedbackStr = `Correct! The pokemon is ${name}`
+        feedbackStr = `Correct! The pokemon is ${PokemonDOMFactory.StrHelpers.capitalize(name)}`
         correctAnswers++
       } else {
         takeLifeAway()
@@ -1502,9 +1509,7 @@ let GameControl = (function() {
         wrongAnswers++
         if (lives === 0) feedbackStr = `Game over! You answered a total of ${correctAnswers} right out of ${correctAnswers + wrongAnswers}. Better luck next time!`
         else {
-          feedbackStr = `Incorrect! You answered ${userAnswer}, but the pokemon is ${name}.`
-          if (lives > 1) feedbackStr += `You have ${lives} lives left.`
-          else feedbackStr += `You only have ${lives} life left!`
+          feedbackStr = `Incorrect! You answered ${PokemonDOMFactory.StrHelpers.capitalize(userAnswer)}, but the pokemon is ${PokemonDOMFactory.StrHelpers.capitalize(name)}.`
         }
       }
 
@@ -1517,11 +1522,11 @@ let GameControl = (function() {
   function createQuestionCard(imageUrl) {
     const container = document.createElement('div')
     container.classList.add('card', 'mx-auto', 'col', 'col-8', 'col-md-4', 'align-self-center')
-    container.setAttribute('id', 'whoseThatPokemonCard')
+    container.setAttribute('id', 'whosThatPokemonCard')
     
     const imgElement = document.createElement('img')
-    imgElement.classList.add('card-img-top', 'filtered-img')
-    imgElement.setAttribute('id', 'whoseThatPokemonImage')
+    imgElement.classList.add('card-img-top', 'filtered-img', 'crazy-gradient')
+    imgElement.setAttribute('id', 'whosThatPokemonImage')
     imgElement.setAttribute('src', imageUrl)
 
     const cardBody = document.createElement('div')
@@ -1563,7 +1568,7 @@ let GameControl = (function() {
 
   // Function to display feedback to user
   function createFeedBack(feedbackStr, canContiue) {
-    const cardContainer = document.getElementById('whoseThatPokemonCard')
+    const cardContainer = document.getElementById('whosThatPokemonCard')
     const cardBody = document.createElement('div')
     cardBody.classList.add('card-body')
     cardBody.setAttribute('id', 'feedback')
