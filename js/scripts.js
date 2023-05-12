@@ -7,6 +7,10 @@ let PokemonDOMFactory = (function() {
   row.classList.add('row', 'justify-content-center', 'scroll-y', 'larger-mobile')
   pokemonCardsContainer.appendChild(row)
 
+  // On page load, set pokemon card container to diabled
+  window.onload = pokemonCardsContainer.setAttribute('disabled', 'true')
+  
+
   // IIFE for string helpers
   const StrHelpers = (function() {
     // Capitalize String Helper
@@ -856,10 +860,10 @@ let PokemonDOMFactory = (function() {
         let tutorMoves = moves.sortAlphabetical().tutor
         let eggMoves = moves.sortAlphabetical().egg
 
-        if ( naturalMoves !== 0) accordionContainer.appendChild(createAccordionCard(naturalMoves, 'natural'))
-        if ( machineMoves !== 0) accordionContainer.appendChild(createAccordionCard(machineMoves, 'machine'))
-        if ( tutorMoves !== 0) accordionContainer.appendChild(createAccordionCard(tutorMoves, 'tutor'))
-        if ( eggMoves !== 0) accordionContainer.appendChild(createAccordionCard(eggMoves, 'egg'))
+        if ( naturalMoves.length !== 0) accordionContainer.appendChild(createAccordionCard(naturalMoves, 'natural'))
+        if ( machineMoves.length !== 0) accordionContainer.appendChild(createAccordionCard(machineMoves, 'machine'))
+        if ( tutorMoves.length !== 0) accordionContainer.appendChild(createAccordionCard(tutorMoves, 'tutor'))
+        if ( eggMoves.length !== 0) accordionContainer.appendChild(createAccordionCard(eggMoves, 'egg'))
         
         sectionContainer.appendChild(accordionContainer)
         
@@ -922,7 +926,6 @@ let PokemonDOMFactory = (function() {
   })
 
   $('#myModal').on('hidden.bs.modal', function(e) {
-    let pokemonCard = $(e.relatedTarget)[0]
     $('#myModal').find('.modal-title').text('')
     $('#myModal').find('.modal-body').html('')
   })
@@ -1359,13 +1362,26 @@ let GameControl = (function() {
     e.preventDefault()
     if (isPlaying) return
     this.setAttribute('disabled', 'true')
+    document.getElementById('searchBar').setAttribute('disabled', 'true')
+    preventDropDownMenu()
     clearPokemonList()
-    isPlaying = true
-    lives = 5
-    playGame()
+    resetGame(true)
   })
 
+  function preventDropDownMenu() {
+    let ddm = document.getElementById('navbarSupportedContent')
+    if (ddm.classList.contains('show')) ddm.classList.toggle('show')
+  }
+
   const pokemonCardsContainer = document.getElementById('pokemonCardsContainer')
+  function clearPokemonList() {
+    // Next, clear the pokemon cards container child element
+    pokemonCardsContainer.children[0].remove()
+
+    // Hide the filter by types containers
+    document.getElementById('filterTypesContainer-Desktop').classList.toggle('hidden')
+    document.getElementById('navbarToggler').setAttribute('disabled', 'true')
+  }
 
   // Function to get random number
   const getRandomNumber = () => {
@@ -1381,13 +1397,82 @@ let GameControl = (function() {
     return output
   }
 
-  function clearPokemonList() {
-    // Next, clear the pokemon cards container child element
-    pokemonCardsContainer.children[0].remove()
-
-    // Hide the filter by types containers
+  function resetGame(explain) {
+    isPlaying = true
+    lives = 5
+    pokemonUsedIds = []
+    correctAnswers = 0
+    wrongAnswers = 0
+    if (explain) return explainGame()
+    else return playGame()
+  }
+  
+  function endGame() {
+    isPlaying = false
+    lives = 0
+    pokemonUsedIds = []
+    correctAnswers = 0
+    wrongAnswers = 0
+    startGameButton.removeAttribute('disabled')
     document.getElementById('filterTypesContainer-Desktop').classList.toggle('hidden')
-    document.getElementById('navbarToggler').setAttribute('disabled', 'true')
+    document.getElementById('navbarToggler').removeAttribute('disabled')
+    document.getElementById('searchBar').removeAttribute('disabled')
+    PokemonDOMFactory.loadPokemonCards()
+  }
+
+  // Function to explain the game
+  function explainGame() {
+    const container = document.createElement('div')
+    container.classList.add('row', 'justify-content-center', 'align-self-center', 'position-absolute', 'explain-game-card')
+    const subContainer = document.createElement('div')
+    subContainer.classList.add('row')
+    const card = document.createElement('div')
+    card.classList.add('card')
+    const cardBody = document.createElement('div')
+    cardBody.classList.add('card-body')
+    const cardTitle = document.createElement('h5')
+    cardTitle.classList.add('card-title')
+    cardTitle.innerText = `Who's That Pokemon?`
+    const cardText = document.createElement('p')
+    cardText.classList.add('card-text', 'pt-3', 'pb-2')
+    cardText.innerText = `In this game, you will be givin randomly selected outlines of Pokemon and then asked to guess. If you get 5 incorrect, you lose.  Want to play? `
+    const leaveGame = document.createElement('button')
+    leaveGame.classList.add('btn', 'btn-danger', 'mt-3')
+    leaveGame.setAttribute('type', 'button')
+    leaveGame.innerText = 'Leave Game'
+    const startButton = document.createElement('button')
+    startButton.classList.add('btn', 'btn-success', 'mt-3', 'ml-5')
+    startButton.setAttribute('type', 'button')
+    startButton.innerText = 'Start Game'
+    
+    leaveGame.addEventListener('click', () => {
+      container.remove()
+      endGame()
+    })
+
+    startButton.addEventListener('click', () => {
+      container.remove()
+      createLives()
+      playGame()
+    })
+    
+
+    cardBody.appendChild(cardTitle)
+    cardBody.appendChild(cardText)
+    cardBody.appendChild(leaveGame)
+    cardBody.appendChild(startButton)
+    card.appendChild(cardBody)
+    subContainer.appendChild(card)
+    container.appendChild(subContainer)
+
+    pokemonCardsContainer.appendChild(container)
+  }
+
+  function takeLifeAway() {
+    const lifeElements = Array.from(document.querySelectorAll('.life'))
+    const removeLast = lifeElements[lifeElements.length - 1]
+    removeLast.remove()
+    return
   }
   
   // Function to set up the game and start it
@@ -1409,6 +1494,7 @@ let GameControl = (function() {
         feedbackStr = `Correct! The pokemon is ${name}`
         correctAnswers++
       } else {
+        takeLifeAway()
         lives--
         wrongAnswers++
         if (lives === 0) feedbackStr = `Game over! You answered a total of ${correctAnswers} right out of ${correctAnswers + wrongAnswers}. Better luck next time!`
@@ -1424,31 +1510,10 @@ let GameControl = (function() {
     
   }
 
-  function resetGame() {
-    isPlaying = true
-    lives = 5
-    pokemonUsedIds = []
-    correctAnswers = 0
-    wrongAnswers = 0
-    playGame()
-  }
-  
-  function endGame() {
-    isPlaying = false
-    lives = 0
-    pokemonUsedIds = []
-    correctAnswers = 0
-    wrongAnswers = 0
-    startGameButton.removeAttribute('disabled')
-    document.getElementById('filterTypesContainer-Desktop').classList.toggle('hidden')
-    document.getElementById('navbarToggler').removeAttribute('disabled')
-    PokemonDOMFactory.loadPokemonCards()
-  }
-
   // Function to create a card element with passed pokemon
   function createQuestionCard(imageUrl) {
     const container = document.createElement('div')
-    container.classList.add('card', 'w-25', 'mx-auto')
+    container.classList.add('card', 'mx-auto', 'col', 'col-8', 'col-md-4', 'align-self-center')
     container.setAttribute('id', 'whoseThatPokemonCard')
     
     const imgElement = document.createElement('img')
@@ -1538,5 +1603,42 @@ let GameControl = (function() {
     }
     
     cardContainer.appendChild(cardBody)
+  }
+
+  // Function to create a pokeball
+  function createPokeball() {
+    const parent = document.createElement('div')
+    parent.classList.add('parent-container', 'life')
+    const outerCircle = document.createElement('div')
+    outerCircle.classList.add('outer-circle')
+    const innerCircle = document.createElement('div')
+    innerCircle.classList.add('inner-circle')
+    const line = document.createElement('div')
+    line.classList.add('line')
+    const colorContainerTop = document.createElement('div')
+    colorContainerTop.classList.add('color-container', 'top')
+    const colorContainerBottom = document.createElement('div')
+    colorContainerBottom.classList.add('color-container', 'bottom')
+
+    parent.appendChild(outerCircle)
+    parent.appendChild(innerCircle)
+    parent.appendChild(line)
+    parent.appendChild(colorContainerTop)
+    parent.appendChild(colorContainerBottom)
+    return parent
+  }
+
+  // Function create lives
+  function createLives() {
+    const container = document.createElement('div')
+    container.classList.add('lives-container', 'd-flex')
+
+    for (let i = 0; i < lives; i++) {
+      const pokeBall = createPokeball()
+      pokeBall.setAttribute('id', i + 1)
+      container.appendChild(pokeBall)
+    }
+
+    pokemonCardsContainer.appendChild(container)
   }
 })()
