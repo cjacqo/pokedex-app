@@ -754,8 +754,11 @@ let PokemonDOMFactory = (function() {
           cardHeader.classList.add('card-header', 'bg-secondary', 'text-light')
           cardHeader.setAttribute('id', `${groupName}Heading`)
           const headerWrapper = document.createElement('h5')
-          headerWrapper.classList.add('mb-0')
+          headerWrapper.classList.add('mb-0', 'moves-title-element')
           headerWrapper.innerText = StrHelpers.capitalize(groupName) + ' Moves'
+          const totalMovesCount = document.createElement('span')
+          totalMovesCount.innerText = moves.length
+          headerWrapper.appendChild(totalMovesCount)
           const collapseButton = document.createElement('button')
           collapseButton.classList.add('btn', 'w-100')
           collapseButton.dataset.toggle = 'collapse'

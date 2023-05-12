@@ -539,35 +539,7 @@ nav {
 
 /* MOVES CONTENT */
 /* --- Moves Group */
-.moves-group {
-  padding: 0 2rem;
-}
-.moves-wrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
-/* --- Move Elements */
-.move-row {
-  align-items: center;
-}
-.move-detail {
-  line-height: 1;
-  /* padding: 1rem 0.5rem; */
-}
-.move-level-element {
-  flex-basis: 15%;
-}
-.move-title-element {
-  text-align: left;
-  flex-basis: 50%;
-}
-.move-type-element {
-  flex-basis: 20%;
-}
-.move-button {
-  width: 36px;
-}
+
 /* --- Move Stats: Dropdown */
 .drop-down-row {
   width: 85%;
