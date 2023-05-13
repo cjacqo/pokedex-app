@@ -1055,6 +1055,7 @@ let PokemonRepository = (function() {
   }
 
   const finalizePokemon = async function(pokemonArr) {
+    console.log(pokemonArr)
     try {
       for (let i = 0; i < pokemonArr.length; i++) {
         const currentPokemon = pokemonArr[i]
