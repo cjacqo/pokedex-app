@@ -1424,6 +1424,9 @@ let GameControl = (function() {
     document.getElementById('filterTypesContainer-Desktop').classList.toggle('hidden')
     document.getElementById('navbarToggler').removeAttribute('disabled')
     document.getElementById('searchBar').removeAttribute('disabled')
+    while (pokemonCardsContainer.children.length !== 0) {
+      pokemonCardsContainer.children[0].remove()
+    }
     PokemonDOMFactory.loadPokemonCards()
   }
 
