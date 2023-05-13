@@ -876,7 +876,6 @@ let PokemonDOMFactory = (function() {
       function appendSections() {
         const sectionsArr = []
         const { stats, profile, evolutions, moves } = pokemon
-        console.log(moves.library.data.natural)
         sectionsArr.push(createNameImageTypeStats(stats.stats))
         sectionsArr.push(createProfileDetails(profile))
         if (evolutions.chain.length > 1) sectionsArr.push(createEvolutions(evolutions.chain))
