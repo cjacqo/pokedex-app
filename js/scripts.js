@@ -463,7 +463,7 @@ let PokemonDOMFactory = (function() {
       function createNameImageTypeStats(stats) {
         // Parent Container
         const sectionContainer = document.createElement('div')
-        sectionContainer.classList.add('d-flex', 'border-bottom', 'pb-3')
+        sectionContainer.classList.add('d-flex', 'border-bottom', 'pb-3', 'flex-column', 'align-items-center')
         sectionContainer.setAttribute('id', 'imageTypeStatsSection')
 
         // Image Figure
@@ -471,7 +471,7 @@ let PokemonDOMFactory = (function() {
           const figureContainer = document.createElement('figure')
           figureContainer.classList.add('figure')
           const imgElement = document.createElement('img')
-          imgElement.classList.add('figure-img', 'img-fluid', 'rounded')
+          imgElement.classList.add('figure-img', 'img-fluid', 'rounded', 'w-100', 'h-100')
           imgElement.setAttribute('alt', `Image of ${StrHelpers.capitalize(name)}`)
           imgElement.setAttribute('src', imageUrl)
           figureContainer.appendChild(imgElement)
@@ -510,7 +510,7 @@ let PokemonDOMFactory = (function() {
             const statWrapper = document.createElement('div')
             statWrapper.classList.add('stat-wrapper')
             const statTitle = document.createElement('span')
-            statTitle.classList.add('stat-title', 'small')
+            statTitle.classList.add('small', 'text-left')
             statTitle.innerText = stat.name.length <= 2 ? stat.name.toUpperCase()
               : stat.name === 'special-attack' ? 'SP Attk'
               : stat.name === 'special-defense' ? 'SP Def'
@@ -685,8 +685,8 @@ let PokemonDOMFactory = (function() {
           nextEvolutionCardContainer.classList.add('card', 'align-items-center', 'justify-content-center', 'border-0')
           const currEvolutionImg = document.createElement('img')
           const nextEvolutionImg = document.createElement('img')
-          currEvolutionImg.classList.add('card-img-top', 'small-card-img')
-          nextEvolutionImg.classList.add('card-img-top', 'small-card-img')
+          currEvolutionImg.classList.add('card-img-top', 'small-card-img', 'w-50')
+          nextEvolutionImg.classList.add('card-img-top', 'small-card-img', 'w-50')
 
           currEvolutionImg.setAttribute('src', currEvolution.species.imageUrl)
           nextEvolutionImg.setAttribute('src', nextEvolution.species.imageUrl)
@@ -828,19 +828,19 @@ let PokemonDOMFactory = (function() {
             moveDetailsCollapseCard.classList.add('card', 'card-body', 'bg-light', 'border-0', 'rounded-0')
             
             const moveStatsContainer = document.createElement('div')
-            moveStatsContainer.classList.add('move-stats-container')
+            moveStatsContainer.classList.add('move-stats-container', 'd-flex', 'justify-content-around')
             const powerTitle = document.createElement('p')
             powerTitle.innerText = `Power: ${power ? power : 'N/A'}`
             const accuracyTitle = document.createElement('p')
-            accuracyTitle.innerText = `Power: ${accuracy ? accuracy : 'N/A'}`
+            accuracyTitle.innerText = `Accuracy: ${accuracy ? accuracy : 'N/A'}`
             const ppTitle = document.createElement('p')
-            ppTitle.innerText = `Power: ${pp ? pp : 'N/A'}`
+            ppTitle.innerText = `PP: ${pp ? pp : 'N/A'}`
             moveStatsContainer.appendChild(powerTitle)
             moveStatsContainer.appendChild(accuracyTitle)
             moveStatsContainer.appendChild(ppTitle)
 
             const moveEffectContainer = document.createElement('div')
-            moveEffectContainer.classList.add('move-effect-container')
+            moveEffectContainer.classList.add('move-effect-container', 'text-left', 'pl-2')
             const moveEffectContent = document.createElement('p')
             moveEffectContainer.innerText = effect
             moveEffectContainer.appendChild(moveEffectContent)
